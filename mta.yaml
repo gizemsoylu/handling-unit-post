@@ -75,7 +75,7 @@ modules:
     requires:
 
     
-sources:
+resources:
 # ============================== Authentication Service =======================
 - name: handling-unit-post-auth
 # =============================================================================
@@ -140,12 +140,12 @@ sources:
     service-plan: app-runtime
     
 # ========================== Build Parameters =================================
-rameters:
-enable-parallel-deployments: true
-ild-parameters:
-before-all:
-  - builder: custom
-    commands:
-    - npm ci
-    - npx cds build --production
-    - npm run build-ts
+parameters:
+  enable-parallel-deployments: true
+  ild-parameters:
+  before-all:
+    - builder: custom
+      commands:
+      - npm ci
+      - npx cds build --production
+      - npm run build-ts

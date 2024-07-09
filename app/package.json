@@ -7,6 +7,12 @@
     "node": "^20.0.0"
   },
   "scripts": {
-    "start": "node node_modules/@sap/approuter/approuter.js"
+    "start": "node node_modules/@sap/approuter/approuter.js",
+    "build-ui": "npm --prefix handling-unit-post-ui run build:cf",
+    "start-local": "npm run build-ui && node -r dotenv/config node_modules/@sap/html5-repo-mock/index.js"
+  },
+  "devDependencies": {
+    "@sap/html5-repo-mock": "^2.1.10",
+    "dotenv": "^16.4.5"
   }
 }

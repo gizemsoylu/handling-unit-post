@@ -29,7 +29,10 @@
     "start": "cds-serve",
     "hana-deploy": "cds deploy --to hana:handling-unit-post-db",
     "watch-handling-unit-post-ui": "cds watch --open handling-unit-post-ui/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-handling-unit-post": "cds watch --open handling-unit-post/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-handling-unit-post": "cds watch --open handling-unit-post/webapp/index.html?sap-ui-xx-viewCache=false",
+    "undeploy": "cf undeploy handling-unit-post --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
   },
   "cds": {
     "requires": {

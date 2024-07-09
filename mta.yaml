@@ -73,8 +73,24 @@ modules:
   build-parameters:
     build-result: resources
     requires:
+    - artifacts:
+      - comndbshandlingunitpostui.zip
+      name: comndbshandlingunitpostui
+      target-path: resources/
 
-    
+# ============================ HTML5 Module ===================================       
+- name: comndbshandlingunitpostui
+# =============================================================================
+  type: html5
+  path: app/handling-unit-post-ui
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+
 resources:
 # ============================== Authentication Service =======================
 - name: handling-unit-post-auth
@@ -141,11 +157,12 @@ resources:
     
 # ========================== Build Parameters =================================
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
-  ild-parameters:
+build-parameters:
   before-all:
-    - builder: custom
-      commands:
-      - npm ci
-      - npx cds build --production
-      - npm run build-ts
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production
+    - npm run build-ts

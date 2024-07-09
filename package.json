@@ -1,0 +1,75 @@
+{
+  "name": "handling-unit-post",
+  "version": "1.0.0",
+  "description": "Handling unit Post Application",
+  "repository": "https://github.com/gizemsoylu/handling-unit-post.git",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@cap-js-community/odata-v2-adapter": "^1.12.12",
+    "@sap/cds": "^7",
+    "@sap/cds-hana": "^2",
+    "@sap/xssec": "^3",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^1",
+    "@sap/cds-dk": "^7",
+    "@sap/eslint-plugin-cds": "^3",
+    "@sap/ux-specification": "^1.120.14",
+    "@types/chai": "^4.3.16",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.10",
+    "cds-plugin-ui5": "^0.6.13",
+    "eslint": "^9",
+    "rimraf": "^5.0.8",
+    "typescript": "^5.5.3"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "hana-deploy": "cds deploy --to hana:handling-unit-post-db",
+    "watch-handling-unit-post-ui": "cds watch --open handling-unit-post-ui/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-handling-unit-post": "cds watch --open handling-unit-post/webapp/index.html?sap-ui-xx-viewCache=false"
+  },
+  "cds": {
+    "requires": {
+      "auth": {
+        "[development]": {
+          "kind": "mocked",
+          "users": {
+            "admin": {
+              "password": "admin"
+            }
+          }
+        },
+        "[hybrid]": {
+          "kind": "xsuaa"
+        },
+        "[production]": {
+          "kind": "xsuaa"
+        }
+      },
+      "db": {
+        "[development]": {
+          "kind": "sqlite"
+        },
+        "[hybrid]": {
+          "kind": "hana"
+        },
+        "[production]": {
+          "kind": "hana"
+        }
+      },
+      "destinations": true,
+      "html5-repo": true
+    },
+    "destinations": true,
+    "cov2ap": {
+      "plugin": true
+    }
+  },
+  "sapux": [
+    "app/handling-unit-post-ui",
+    "app/handling-unit-post"
+  ]
+}

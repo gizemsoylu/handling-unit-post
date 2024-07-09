@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "types": [
+            "express",
+            "node",
+            "chai"
+        ],
+        "target": "ES2022",
+        "strict": true,
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "resolveJsonModule": true,
+        "noEmitOnError": true,
+        "noImplicitAny": false,
+        "noImplicitThis": true,
+        "allowUnreachableCode": false,
+        "sourceMap": true,
+        "strictPropertyInitialization": false,
+        "outDir": "./gen/srv/srv",
+        "allowSyntheticDefaultImports": true
+    },
+    "include": [
+        "srv"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

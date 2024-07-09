@@ -1,0 +1,151 @@
+_schema-version: '3.1'
+ID: handling-unit-post
+version: 1.0.0
+description: "Handling Unit Post"
+
+modules:
+# =========================== Backend Nodejs Module ===========================
+- name: handling-unit-post-srv
+# =============================================================================
+  type: nodejs
+  path: gen/srv
+  requires:
+    - name: handling-unit-post-auth
+    - name: handling-unit-post-db
+    - name: handling-unit-post-dest
+  parameters:
+    readiness-health-check-http-endpoint: /health
+    readiness-health-check-type: http
+    buildpack: nodejs_buildpack
+  provides:
+    - name: srv-api
+      properties:
+        srv-url: ${default-url}
+  build-parameters:
+    builder: npm
+    ignore:
+    - default-env.json
+    - .env
+    - '**/*.ts'
+    - srv/**/*.ts
+    - srv/lib/**/*.ts
+
+# ============================ DB Deployer Module =============================
+- name: handling-unit-post-db-deployer
+# =============================================================================
+  type: hdb
+  path: gen/db
+  requires:
+    - name: handling-unit-post-db
+  parameters:
+    buildpack: nodejs_buildpack
+
+# ============================= Approuter Module ==============================
+- name: handling-unit-post-app
+# =============================================================================
+  type: approuter.nodejs
+  path: app
+  requires:
+    - name: handling-unit-post-auth
+    - name: handling-unit-post-repo-runtime
+    - name: srv-api
+      group: destinations
+      properties:
+        name: backend-api 
+        url: ~{srv-url}
+        forwardAuthToken: true
+  parameters:
+    keep-existing-routes: true
+    disk-quota: 1024M
+    memory: 1024M
+
+# ============================= App Content ===================================
+- name: handling-unit-post-app-content
+# =============================================================================
+  type: com.sap.application.content
+  path: .
+  requires:
+    - name: handling-unit-post-auth
+    - name: handling-unit-post-dest
+    - name: handling-unit-post-repo-host
+      parameters:
+        content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+
+    
+sources:
+# ============================== Authentication Service =======================
+- name: handling-unit-post-auth
+# =============================================================================
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: xsuaa
+    service-plan: application
+    path: ./xs-security.json
+
+# ================================ HDI Container ==============================
+- name: handling-unit-post-db
+# =============================================================================
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+
+# ===============================  Destination Service ========================
+- name: handling-unit-post-dest
+# =============================================================================
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: destination
+    service-plan: lite
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Description: CAP Backend OData Service Destination
+            HTML5.DynamicDestination: true
+            Name: backend-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
+            HTML5.Timeout: 300000   
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+  requires:
+    - name: srv-api
+        
+# ===================== HTML5 Repo Host Service ===============================
+- name: handling-unit-post-repo-host
+# =============================================================================
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: handling-unit-post-html5-srv
+    service-plan: app-host
+
+# ========================== HTML5 Repo Runtime ===============================
+- name: handling-unit-post-repo-runtime
+# =============================================================================
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-plan: app-runtime
+    
+# ========================== Build Parameters =================================
+rameters:
+enable-parallel-deployments: true
+ild-parameters:
+before-all:
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production
+    - npm run build-ts

@@ -1,6 +1,14 @@
 {
+  "xsappname": "handling-unit-post",
+  "tenant-mode": "dedicated",
   "scopes": [],
   "attributes": [],
   "role-templates": [],
-  "authorities-inheritance": false
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://port1299-workspaces-ws-wjz4t.eu10.applicationstudio.cloud.sap/login/callback", 
+      "https://*.us10-001.hana.ondemand.com/**",
+      "http://localhost:1299/login/callback"
+    ]
+  }
 }

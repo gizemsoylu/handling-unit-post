@@ -23,3 +23,10 @@ builder:
       archiveName: comndbshandlingunitpostui
       additionalFiles:
       - xs-app.json
+  - name: ui5-tooling-transpile-task
+    afterTask: replaceVersion
+    configuration:
+      debug: true
+      removeConsoleStatements: true
+      transpileAsync: false
+      transpileTypeScript: true

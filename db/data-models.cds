@@ -1,3 +1,4 @@
+@cds.persistence.skip
 entity HandlingUnits {
     key ExternalID          : String;
         HierarchyLevel      : Integer;
@@ -15,10 +16,4 @@ entity HandlingUnits {
         ReferenceDocType    : String;
         Status              : String;
         StatusName          : String;
-}
-
-entity StorageLocations {
-    key StorageLocation     : String;
-        StorageLocationName : String;
-        Plant               : String;
 }

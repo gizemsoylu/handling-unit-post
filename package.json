@@ -53,7 +53,15 @@
         }
       },
       "destinations": true,
-      "html5-repo": true
+      "html5-repo": true,
+      "HUPalletEWM": {
+        "kind": "odata-v2",
+        "model": "srv/external/HUPalletEWM.edx",
+        "credentials": {
+          "destination": "MCI410168",
+          "path": "sap/opu/odata/sap/YY1_HUPalletEWM"
+        }
+      }
     },
     "destinations": true,
     "cov2ap": {

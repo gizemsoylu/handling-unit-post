@@ -1,0 +1,193 @@
+{
+ "meta": {
+  "creator": "cds-dk 7.9.2"
+ },
+ "$version": "2.0",
+ "definitions": {
+  "HUPalletEWM_edx": {
+   "kind": "service",
+   "@cds.external": true,
+   "@m.IsDefaultEntityContainer": "true",
+   "@sap.message.scope.supported": "true",
+   "@sap.supported.formats": "atom json xlsx"
+  },
+  "HUPalletEWM_edx.YY1_HUPalletEWM": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "@sap.creatable": "false",
+   "@sap.updatable": "false",
+   "@sap.deletable": "false",
+   "@sap.content.version": "1",
+   "@sap.label": "HU Pallet EWM",
+   "elements": {
+    "HandlingUnitNumber": {
+     "key": true,
+     "type": "cds.String",
+     "length": 20,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Handling Unit",
+     "@sap.quickinfo": "Handling Unit Identification",
+     "notNull": true
+    },
+    "EWMWarehouse": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Warehouse Number",
+     "@sap.quickinfo": "Warehouse Number/Warehouse Complex",
+     "notNull": true
+    },
+    "HandlingUnitIndicator": {
+     "key": true,
+     "type": "cds.String",
+     "length": 1,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Virtual HU",
+     "@sap.quickinfo": "Virtual Handling Unit",
+     "notNull": true
+    },
+    "HandlingUnitType": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Handling Unit Type"
+    },
+    "HandlingUnitStatus": {
+     "type": "cds.String",
+     "length": 1,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Internal Status",
+     "@sap.quickinfo": "Internal Status of a Handling Unit"
+    },
+    "HandlingUnitBottomInd": {
+     "type": "cds.String",
+     "length": 1,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "HandlingUnitBottomInd"
+    },
+    "HandlingUnitTopLevelInd": {
+     "type": "cds.String",
+     "length": 1,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "HandlingUnitTopLevelInd"
+    },
+    "PackagingMaterialType": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Packaging Matl Type",
+     "@sap.quickinfo": "Packaging Material Type"
+    },
+    "EWMDimensionUnit": {
+     "type": "cds.String",
+     "length": 3,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Unit of Dimension",
+     "@sap.quickinfo": "Unit of Dimension for Length/Width/Height",
+     "@sap.semantics": "unit-of-measure"
+    },
+    "EWMConsolidationGroup": {
+     "type": "cds.String",
+     "length": 10,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Consolidation Group"
+    },
+    "HandlingUnitContentInd": {
+     "type": "cds.String",
+     "length": 1,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Content Indicator",
+     "@sap.quickinfo": "Indicator of HU Content Type"
+    },
+    "HandlingUnitObjRefInd": {
+     "type": "cds.String",
+     "length": 1,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "HandlingUnitObjRefInd"
+    },
+    "EWMHghstLvlHandlingUnitUUID": {
+     "type": "cds.UUID",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Highest-Level Handling Unit",
+     "@sap.quickinfo": "DO NOT USE: Highest-Level Handling Unit"
+    },
+    "HandlingUnitUUID": {
+     "type": "cds.UUID",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "HU GUID",
+     "@sap.quickinfo": "Unique Internal Identification of a Handling Unit"
+    },
+    "HandlingUnitNumber_1": {
+     "type": "cds.String",
+     "length": 20,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Handling Unit",
+     "@sap.quickinfo": "Handling Unit Identification"
+    },
+    "PackagingMaterialType_1": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Packaging Matl Type (box)",
+     "@sap.quickinfo": "Packaging Material Type"
+    },
+    "MaterialNumber": {
+     "type": "cds.String",
+     "length": 20,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "MaterialNumber",
+     "@sap.quickinfo": "Text of length 20"
+    },
+    "ProductionOrder": {
+     "type": "cds.String",
+     "length": 20,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "ProductionOrder",
+     "@sap.quickinfo": "Text of length 20"
+    },
+    "EWMHUProcessStepIsCompleted": {
+     "type": "cds.Boolean",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "HU Step Completed",
+     "@sap.quickinfo": "Process Step for HU Completed"
+    },
+    "ProcessStepCompletedInd": {
+     "type": "cds.Boolean",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "HU Step Completed",
+     "@sap.quickinfo": "Process Step for HU Completed"
+    },
+    "EWMStorageType": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Storage Type"
+    },
+    "EWMStorageBin": {
+     "type": "cds.String",
+     "length": 18,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Storage Bin"
+    },
+    "CreationDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Short Time Stamp",
+     "@sap.quickinfo": "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"
+    }
+   }
+  }
+ }
+}

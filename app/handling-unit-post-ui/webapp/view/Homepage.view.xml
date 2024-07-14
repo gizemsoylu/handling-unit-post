@@ -1,7 +1,106 @@
-<mvc:View controllerName="com.ndbs.handlingunitpostui.controller.Homepage"
-    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
-    xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-        <content />
+<mvc:View
+    controllerName="com.ndbs.handlingunitpostui.controller.Homepage"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:table="sap.ui.table"
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:app="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+>
+    <Page
+        id="Homepage"
+        showHeader="false"
+    >
+        <f:ShellBar
+            title="{i18n>homepage}"
+            homeIcon="./img/sap_logo.png"
+            showSearch="true"
+            showNotifications="true"
+        >
+            <f:profile>
+                <Avatar initials="UI" />
+            </f:profile>
+        </f:ShellBar>
+
+        <FlexBox
+            justifyContent="Center"
+            alignItems="Center"
+        >
+            <VBox width="95%">
+                <smartFilterBar:SmartFilterBar
+                    id="sfbHandlingUnit"
+                    entitySet="HandlingUnits"
+                    useProvidedNavigationProperties="true"
+                    enableBasicSearch="true"
+                />
+                <smartTable:SmartTable
+                    id="stHandlingUnit"
+                    entitySet="HandlingUnits"
+                    smartFilterId="sfbHandlingUnit"
+                    tableType="TreeTable"
+                    useTablePersonalisation="true"
+                    header="{i18n>handlingUnit}"
+                    showRowCount="true"
+                    enableAutoBinding="true"
+                    editTogglable="false"
+                    app:useSmartToggle="false"
+                    showFullScreenButton="true"
+                >
+                    <smartTable:customToolbar>
+                        <OverflowToolbar design="Transparent">
+                            <ToolbarSpacer />
+                            <Button
+                                text="{i18n>post}"
+                                type="Emphasized"
+                                press="onPostHandlingUnit"
+                            />
+                        </OverflowToolbar>
+                    </smartTable:customToolbar>
+                    <smartTable:layoutData>
+                        <FlexItemData growFactor="1" />
+                    </smartTable:layoutData>
+                    <table:TreeTable id="uiTreeHandlingUnit" selectionMode="Single">
+                        <table:rowSettingsTemplate>
+                            <table:RowSettings
+                                highlight="{path: 'HUStatus', formatter: '.formatter.setStatusHighlight'}"
+                            />
+                        </table:rowSettingsTemplate>
+                        <table:columns>
+                            <table:Column width="8rem">
+                                <table:customData>
+                                    <core:CustomData
+                                        key="p13nData"
+                                        value='\{"columnKey": "HUStatus", "leadingProperty": "HUStatus", "columnIndex": 1}'
+                                    />
+                                </table:customData>
+                                <Label text="{i18n>status}" />
+                                <table:template>
+                                    <ObjectStatus
+                                        text="{HUStatus}"
+                                        state="{
+								path: 'HUStatus',
+								formatter: '.formatter.setStatusHighlight'
+							}"
+                                    />
+                                </table:template>
+                            </table:Column>
+                        </table:columns>
+                    </table:TreeTable>
+                </smartTable:SmartTable>
+            </VBox>
+        </FlexBox>
+         <footer>
+            <OverflowToolbar id="otbFooter">
+                <Button id="btnMessages"
+                    icon="sap-icon://alert"
+                    text="{=${message>/}.length}"
+                    type="Emphasized"
+                    press="onMessagePopoverPress" />
+                <ToolbarSpacer />
+            </OverflowToolbar>
+        </footer>
     </Page>
 </mvc:View>

@@ -175,7 +175,7 @@ sap.registerComponentDependencyPaths(manifestUri)
                     url: "i18n/i18n.properties",
                     locale: sLocale
                 });
-                document.title = oResourceBundle.getText("appTitle");
+                document.title = oResourceBundle.getText("title");
             });
         });
 
@@ -203,7 +203,7 @@ sap.registerComponentDependencyPaths(manifestUri)
                             url: "i18n/i18n.properties",
                             locale: sLocale
                         });
-                        document.title = oResourceBundle.getText("appTitle");
+                        document.title = oResourceBundle.getText("title");
                     });
                 });
             }

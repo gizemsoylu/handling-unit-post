@@ -4,14 +4,14 @@
  },
  "$version": "2.0",
  "definitions": {
-  "HUPalletEWM_edx": {
+  "HUPalletEWM": {
    "kind": "service",
    "@cds.external": true,
    "@m.IsDefaultEntityContainer": "true",
    "@sap.message.scope.supported": "true",
    "@sap.supported.formats": "atom json xlsx"
   },
-  "HUPalletEWM_edx.YY1_HUPalletEWM": {
+  "HUPalletEWM.YY1_HUPalletEWM": {
    "kind": "entity",
    "@cds.external": true,
    "@cds.persistence.skip": true,

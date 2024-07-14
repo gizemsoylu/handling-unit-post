@@ -1,0 +1,512 @@
+{
+ "meta": {
+  "creator": "cds-dk 7.9.2"
+ },
+ "$version": "2.0",
+ "definitions": {
+  "WAREHOUSESTORAGEBIN_0001": {
+   "kind": "service",
+   "@cds.external": true,
+   "@CodeList.UnitsOfMeasure": {
+    "Url": "../../../../default/iwbep/common/0001/$metadata",
+    "CollectionPath": "UnitsOfMeasure"
+   },
+   "@Aggregation.ApplySupported": {
+    "Transformations": [
+     "aggregate",
+     "groupby",
+     "filter"
+    ],
+    "Rollup": {
+     "#": "None"
+    }
+   },
+   "@Common.ApplyMultiUnitBehaviorForSortingAndFiltering": true,
+   "@Capabilities.FilterFunctions": [
+    "eq",
+    "ne",
+    "gt",
+    "ge",
+    "lt",
+    "le",
+    "and",
+    "or",
+    "contains",
+    "startswith",
+    "endswith",
+    "any",
+    "all"
+   ],
+   "@Capabilities.SupportedFormats": [
+    "application/json",
+    "application/pdf"
+   ],
+   "@PDF.Features": {
+    "DocumentDescriptionReference": "../../../../default/iwbep/common/0001/$metadata",
+    "DocumentDescriptionCollection": "MyDocumentDescriptions",
+    "ArchiveFormat": true,
+    "Border": true,
+    "CoverPage": true,
+    "FitToPage": true,
+    "FontName": true,
+    "FontSize": true,
+    "Margin": true,
+    "Padding": true,
+    "Signature": true,
+    "HeaderFooter": true,
+    "ResultSizeDefault": 20000,
+    "ResultSizeMaximum": 20000,
+    "IANATimezoneFormat": true,
+    "Treeview": true
+   },
+   "@Capabilities.KeyAsSegmentSupported": true,
+   "@Capabilities.AsynchronousRequestsSupported": true,
+   "@Authorization.SecuritySchemes": [
+    {
+     "Authorization": "OAuth2Auth",
+     "RequiredScopes": [
+      "OV4:API_WHSE_STORAGE_BIN_2"
+     ]
+    },
+    {
+     "Authorization": "BasicAuth"
+    }
+   ],
+   "@Authorization.Authorizations": [
+    {
+     "$Type": "Auth.OAuth2AuthCode",
+     "Name": "OAuth2Auth",
+     "RefreshUrl": "https://{host}:{port}",
+     "AuthorizationUrl": "https://{host}:{port}",
+     "TokenUrl": "https://{host}:{port}",
+     "Scopes": [
+      {
+       "Scope": "OV4:API_WHSE_STORAGE_BIN_2"
+      }
+     ]
+    },
+    {
+     "$Type": "Auth.Http",
+     "Name": "BasicAuth",
+     "Scheme": "basic"
+    }
+   ]
+  },
+  "WAREHOUSESTORAGEBIN_0001.WarehouseStorageBin": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "EWMWarehouse": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "Warehouse",
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Warehouse Number",
+     "@Common.Heading": "WhN",
+     "@Common.QuickInfo": "Warehouse Number/Warehouse Complex"
+    },
+    "EWMStorageBin": {
+     "key": true,
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Bin",
+     "@Common.Heading": "Bin"
+    },
+    "EWMStorageType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseStorageType",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Type",
+     "@Common.Heading": "Ty."
+    },
+    "EWMStorageBinIsEmpty": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Common.Label": "Empty Storage Bin",
+     "@Common.Heading": "Empty"
+    },
+    "EWMStorageBinIsFull": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Common.Label": "Full Indicator",
+     "@Common.Heading": "Full",
+     "@Common.QuickInfo": "Indicator Whether Storage Bin is Full"
+    },
+    "EWMStorBinVerifiedByMobileID": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Verification",
+     "@Common.Heading": "Verification Field for Mobile Data Entry",
+     "@Common.QuickInfo": "Verification Field for Mobile Data Entry"
+    },
+    "EWMStorBinIsBlockedForRemoval": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Common.Label": "Stock Removal Block",
+     "@Common.Heading": "RB",
+     "@Common.QuickInfo": "Block Indicator: For Stock Removals"
+    },
+    "EWMStorBinIsBlockedForPutaway": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Common.Label": "Putaway Block",
+     "@Common.Heading": "PB",
+     "@Common.QuickInfo": "Block Indicator: For Putaways"
+    },
+    "EWMStorBinIsBlockedDueToPInv": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Common.Label": "Inventory Active",
+     "@Common.Heading": "IA",
+     "@Common.QuickInfo": "Storage Bin Blocked Because of Physical Inventory"
+    },
+    "EWMStorBinFreeDefinedAisleText": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Bin Aisle",
+     "@Common.Heading": "Bin Aisle"
+    },
+    "EWMStorBinFreeDefinedStackText": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Bin Stack",
+     "@Common.Heading": "Stack"
+    },
+    "EWMStorBinFreeDefinedLevelText": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Bin Level",
+     "@Common.Heading": "Bin Level"
+    },
+    "WeightUnit": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUnit": true,
+     "@Common.Label": "Weight Unit",
+     "@Common.Heading": "Un"
+    },
+    "EWMStorageBinMaximumWeight": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "WeightUnit"
+     },
+     "@Common.Label": "Maximum Weight",
+     "@Common.Heading": "Max. Wt",
+     "@Common.QuickInfo": "Maximum Weight of Storage Bin"
+    },
+    "EWMStorageBinUsedWeight": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "WeightUnit"
+     },
+     "@Common.Label": "Weight Used",
+     "@Common.QuickInfo": "Weight of Materials in Storage Bin"
+    },
+    "VolumeUnit": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUnit": true,
+     "@Common.Label": "Volume Unit",
+     "@Common.Heading": "VUn"
+    },
+    "EWMStorageBinMaximumVolume": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "VolumeUnit"
+     },
+     "@Common.Label": "Maximum Volume"
+    },
+    "EWMStorageBinOccupiedVolume": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "VolumeUnit"
+     },
+     "@Common.Label": "Loading Volume",
+     "@Common.QuickInfo": "Loading or Net Volume"
+    },
+    "EWMStorBinTotalCapacityValue": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Common.Label": "Total Capacity",
+     "@Common.QuickInfo": "Total Capacity of Storage Bin"
+    },
+    "EWMStorBinAvailCapacityValue": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Common.Label": "Remaining Capacity",
+     "@Common.Heading": "Remain.Capacity",
+     "@Common.QuickInfo": "Available Capacity in Storage Bin"
+    },
+    "EWMStorBinWidthCoordinateValue": {
+     "type": "cds.Decimal",
+     "precision": 10,
+     "scale": 3,
+     "notNull": true,
+     "@Common.Label": "X Coordinate",
+     "@Common.Heading": "X Coord."
+    },
+    "EWMStorBinLengthCoordinateVal": {
+     "type": "cds.Decimal",
+     "precision": 10,
+     "scale": 3,
+     "notNull": true,
+     "@Common.Label": "Y Coordinate",
+     "@Common.Heading": "Y Coord."
+    },
+    "EWMStorBinHeightCoordinateVal": {
+     "type": "cds.Decimal",
+     "precision": 10,
+     "scale": 3,
+     "notNull": true,
+     "@Common.Label": "Z Coordinate",
+     "@Common.Heading": "Z Coord."
+    },
+    "EWMPhysicalInventoryType": {
+     "type": "cds.String",
+     "length": 2,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "PI Type",
+     "@Common.Heading": "Ty.",
+     "@Common.QuickInfo": "Physical Inventory Type"
+    },
+    "PhysicalInventoryDocNumber": {
+     "type": "cds.String",
+     "length": 20,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehousePhysicalInventoryDoc",
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "PI Document Number",
+     "@Common.QuickInfo": "Physical Inventory Document Number"
+    },
+    "PhysicalInventoryItemNumber": {
+     "type": "cds.String",
+     "length": 6,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehousePhysicalInventoryDoc",
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Item"
+    },
+    "PInvCountedUTCDateTime": {
+     "type": "cds.Timestamp",
+     "@odata.Precision": 7,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Count Date PhysInv",
+     "@Common.Heading": "Date of Last Phys. Inv. Count",
+     "@Common.QuickInfo": "Entered Date of Physical Inventory Count (Time Stamp)"
+    },
+    "EWMStorageBinLastChangedByUser": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Last Changed By",
+     "@Common.Heading": "Last Changer"
+    },
+    "EWMStorageBinLastChgDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Time Stamp",
+     "@Common.QuickInfo": "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"
+    },
+    "EWMStorageBinLastWarehouseTask": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Warehouse Task",
+     "@Common.Heading": "Whse Task"
+    },
+    "EWMStorageBinFirstPutawayDate": {
+     "type": "cds.Date",
+     "@Common.Label": "First Putaway",
+     "@Common.Heading": "First Ptwy",
+     "@Common.QuickInfo": "Date of First Putaway"
+    },
+    "EWMStorageBinLastMvtDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Last Movement",
+     "@Common.QuickInfo": "Last Movement to Bin"
+    },
+    "EWMStorageBinLastClrgDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Last Clearing",
+     "@Common.Heading": "Last Clrg",
+     "@Common.QuickInfo": "Last Bin Clearing"
+    },
+    "EWMStorageBinFixedBinType": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Fixed Stor. Bin Type",
+     "@Common.Heading": "FBinTp",
+     "@Common.QuickInfo": "Fixed Storage Bin Type"
+    },
+    "EWMStorageBinAngleValue": {
+     "type": "cds.Decimal",
+     "precision": 4,
+     "scale": 1,
+     "notNull": true,
+     "@Common.Label": "Bin Angle for Align.",
+     "@Common.Heading": "Angle",
+     "@Common.QuickInfo": "Angle for Alignment of a Storage Bin (Degrees)"
+    },
+    "EWMStorBinNumberOfHndlgUnits": {
+     "type": "cds.Decimal",
+     "precision": 6,
+     "notNull": true,
+     "@Common.Label": "No. of HUs",
+     "@Common.QuickInfo": "Number of Handling Units in Storage Bin"
+    },
+    "EWMStorBinMaxNmbrOfHndlgUnits": {
+     "type": "cds.String",
+     "length": 6,
+     "notNull": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Maximum No. of HUs",
+     "@Common.Heading": "Max HUs",
+     "@Common.QuickInfo": "Maximum Number of Handling Units in Storage Bin"
+    },
+    "EWMStorageSection": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Section",
+     "@Common.Heading": "Sec."
+    },
+    "EWMStorageBinType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Bin Type",
+     "@Common.Heading": "BT"
+    },
+    "EWMStorageBinAccessType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Bin Access Type"
+    },
+    "EWMStorageBinSection": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Bin Section",
+     "@Common.Heading": "S"
+    },
+    "EWMStorageBinPosition": {
+     "type": "cds.String",
+     "length": 2,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Bin position",
+     "@Common.Heading": "Pos",
+     "@Common.QuickInfo": "Position in Storage Bin"
+    },
+    "EWMStorBinFreeDfndSectionText": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Bin Section",
+     "@Common.QuickInfo": "Bin Section of a Storage Bin"
+    },
+    "EWMStorageBinSubdivision": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Division",
+     "@Common.Heading": "A",
+     "@Common.QuickInfo": "Storage Bin is Subdivided"
+    },
+    "EWMStorageGroup": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Storage Group",
+     "@Common.Heading": "StGrp",
+     "@Common.QuickInfo": "Storage Group for Layout-Oriented Storage Control"
+    }
+   },
+   "@Common.Label": "Warehouse Storage Bin",
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.InsertRestrictions.Insertable": false,
+   "@Capabilities.DeleteRestrictions.Deletable": false,
+   "@Capabilities.UpdateRestrictions.Updatable": false,
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true,
+   "@Capabilities.FilterRestrictions.FilterExpressionRestrictions": [
+    {
+     "Property": {
+      "=": "EWMStorageBinMaximumWeight"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "EWMStorageBinUsedWeight"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "EWMStorageBinMaximumVolume"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "EWMStorageBinOccupiedVolume"
+     },
+     "AllowedExpressions": "MultiValue"
+    }
+   ]
+  }
+ }
+}

@@ -1,19 +1,29 @@
 @cds.persistence.skip
 entity HandlingUnits {
-    key ExternalID          : String;
-        HierarchyLevel      : Integer;
-        ParentNodeID        : Integer;
-        DrillState          : String;
-        Material            : String;
-        ProductOrder        : String;
-        PackagingMaterial   : String;
-        Plant               : String;
-        StorageLocation     : String;
-        StorageLocationName : String;
-        Quantity            : Integer;
-        QuantityUnit        : String;
-        Reference           : String;
-        ReferenceDocType    : String;
-        Status              : String;
-        StatusName          : String;
+    key NodeID                      : Integer;
+    key HUNumber                    : String;
+        SubHUNumber                 : String;
+        HierarchyLevel              : Integer;
+        ParentNodeID                : Integer;
+        DrillState                  : String;
+        HUStatus                    : String;
+        HUType                      : String;
+        MaterialNumber              : String;
+        PackagingMaterial           : String;
+        PackagingMaterialType       : String;
+        ProductionOrder             : String;
+        QuantityPerHU               : Integer;
+        EWMStorageBin               : String;
+        EWMStorageType              : String;
+        EWMWarehouse                : String;
+        EWMHUProcessStepIsCompleted : Boolean;
+        EWMDimensionUnit            : String;
+        CreationDate                : DateTime;
 }
+
+@cds.persistence.skip
+entity StorageBins {
+    EWMWarehouse   : String;
+    EWMStorageBin  : String;
+    EWMStorageType : String;
+};

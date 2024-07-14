@@ -13,6 +13,7 @@ SelectionFields  : [
     EWMWarehouse,
     MaterialNumber,
     HUNumber,
+    HUStatus
 ],
 
 LineItem: [
@@ -54,6 +55,14 @@ LineItem: [
         ![@HTML5.CssDefaults] : {
             $Type : 'HTML5.CssDefaultsType',
             width : '6rem',
+        },
+    },
+    {
+        $Type: 'UI.DataField',
+        Value: ProductionOrder,
+        ![@HTML5.CssDefaults] : {
+            $Type : 'HTML5.CssDefaultsType',
+            width : '8rem',
         },
     }
 ], }

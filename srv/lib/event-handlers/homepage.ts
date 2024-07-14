@@ -16,29 +16,16 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         huItems.HUNumber = huItems.HandlingUnitNumber.replace(/^0+/, '');
         huItems.SubHUNumber = huItems.HandlingUnitNumber_1.replace(/^0+/, '');
         huItems.HUType = huItems.HandlingUnitType;
-        huItems.HUStatus = huItems.HandlingUnitStatus;
+        huItems.HUStatus = convertStatus(huItems.HandlingUnitStatus);
         huItems.SubEWMWarehouse = huItems.EWMWarehouse_1;
-        huItems.CreationDate = huItems.CreationDateTime;
-
-        switch (huItems.HandlingUnitStatus) {
-            case 'A':
-                huItems.HUStatus = 'Planned';
-                break;
-            case 'B':
-                huItems.HUStatus = 'Received';
-                break;
-            case 'C':
-                huItems.HUStatus = 'Shipped';
-                break;
-            default:
-                huItems.HUStatus = '';
-                break;
-        }
+        huItems.EWMWarehouse = huItems.EWMWarehouse;
+        huItems.CreationDate = huItems.CreationDateTime ? huItems.CreationDateTime : null;
 
         if (!parentNodeMap[huItems.HUNumber]) {
             parentNodeMap[huItems.HUNumber] = nodeId;
             nodeList.push({
                 ...huItems,
+                ProductionOrder:"",
                 PackagingMaterial: "PALLET",
                 NodeID: nodeId,
                 HierarchyLevel: 0,
@@ -71,6 +58,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
             const hasChild = childNodes.length > 0;
             node.DrillState = hasChild ? "expanded" : "collapse";
             node.SubHUNumber = hasChild ? "" : node.SubHUNumber;
+            node.CreationDate = hasChild ? null : node.CreationDate;
 
             if (hasChild) {
                 const allSameMaterial = childNodes.every(child => child.MaterialNumber === childNodes[0].MaterialNumber);
@@ -121,7 +109,31 @@ const getStorageBins: OnEventHandler = async function (req: TypedRequest<{ EWMWa
     return storageBins;
 }
 
+const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitStatus: string }[]>): Promise<{ HUStatus: string }[]> {
+    const handlingCDS = await connect.to("HUPalletEWM");
+    const { YY1_HUPalletEWM } = handlingCDS.entities;
+    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUPalletEWM).columns('HandlingUnitStatus'));
+    const uniqueStatuses = [...new Set<string>(huPallets.map((item: { HandlingUnitStatus: string; }) => item.HandlingUnitStatus))];
+    const formattedStatuses = uniqueStatuses.map(status => ({ HUStatus: convertStatus(status) }));
+
+    return formattedStatuses;
+}
+
+const convertStatus = (status: string): string => {
+    switch (status) {
+        case 'A':
+            return 'Planned';
+        case 'B':
+            return 'Received';
+        case 'C':
+            return 'Shipped';
+        default:
+            return '';
+    }
+};
+
 export {
     getHandlingUnits,
-    getStorageBins
+    getStorageBins,
+    getHandlingUnitStatus
 }

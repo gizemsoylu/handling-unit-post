@@ -18,7 +18,7 @@ export interface IHandlingUnits {
     SubEWMWarehouse?: string;
     EWMHUProcessStepIsCompleted?: boolean;
     EWMDimensionUnit?: string;
-    CreationDate?: Date | string;
+    CreationDate?: Date | null;
 }
 
 export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
@@ -42,8 +42,9 @@ export interface IHandlingUnitItems {
     HierarchyLevel: number;
     ParentNodeID?: number | null;
     DrillState: string;
-    CreationDate: Date;
-    CreationDateTime: Date;
+    CreationDate: Date | null;
+    CreationDateTime: Date | null;
+    EWMWarehouse:string;
 }
 
 export interface IStorageBins {

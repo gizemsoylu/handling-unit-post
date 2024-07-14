@@ -1,6 +1,7 @@
 
 import BaseController from "./BaseController";
 import formatter from "../model/formatter"
+import { Button$ClickEvent } from "sap/ui/webc/main/Button";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -20,4 +21,9 @@ export default class Homepage extends BaseController {
     /* Event Handlers                                                                                                          */
     /* ======================================================================================================================= */
 
+    public onMoveHandlingUnit(event: Button$ClickEvent) {
+
+        
+        
+    }
 }

@@ -57,7 +57,7 @@
                             <Button
                                 text="{i18n>post}"
                                 type="Emphasized"
-                                press="onPostHandlingUnit"
+                                press="onMoveHandlingUnit"
                             />
                         </OverflowToolbar>
                     </smartTable:customToolbar>

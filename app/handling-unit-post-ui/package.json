@@ -40,5 +40,8 @@
       "ui5-task-zipper",
       "mbt"
     ]
+  },
+  "dependencies": {
+    "ui5-antares": "^1.124.999003"
   }
 }

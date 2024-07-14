@@ -20,6 +20,7 @@ builder:
   - name: ui5-task-zipper
     afterTask: generateCachebusterInfo
     configuration:
+      includeDependencies: true
       archiveName: comndbshandlingunitpostui
       additionalFiles:
       - xs-app.json

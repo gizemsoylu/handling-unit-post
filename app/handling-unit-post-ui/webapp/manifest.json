@@ -43,6 +43,9 @@
     }
   },
   "sap.ui5": {
+    "resourceRoots": {
+      "ui5.antares": "./resources/ui5/antares"
+    },
     "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.125.1",
@@ -54,7 +57,8 @@
         "sap.ui.comp": {},
         "sap.ui.generic.app": {},
         "sap.ui.table": {},
-        "sap.ushell": {}
+        "sap.ushell": {},
+        "ui5.antares": {}
       }
     },
     "contentDensities": {

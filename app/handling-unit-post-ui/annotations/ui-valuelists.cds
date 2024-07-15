@@ -2,7 +2,7 @@ using HandlingUnitPost as service from '../../../srv/data-provider';
 
 annotate service.HandlingUnits {
     @Common.ValueListWithFixedValues: true
-    HUStatus          @Common.ValueList: {
+    HUStatus @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHStatus',
         SearchSupported,
@@ -12,4 +12,20 @@ annotate service.HandlingUnits {
             ValueListProperty: 'HUStatus'
         }]
     };
+}
+
+annotate service.StorageBins {
+    EWMStorageBin @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'StorageBins',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: EWMStorageBin,
+            ValueListProperty: 'EWMStorageBin',
+        }]
+    };
+
+    EWMWarehouse  @Common          : {FilterDefaultValue: '1200'}
+
 }

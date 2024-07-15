@@ -23,7 +23,7 @@ entity HandlingUnits {
 
 @cds.persistence.skip
 entity StorageBins {
-    EWMWarehouse   : String;
-    EWMStorageBin  : String;
-    EWMStorageType : String;
+    key EWMWarehouse   : String;
+    key EWMStorageBin  : String;
+        EWMStorageType : String;
 };

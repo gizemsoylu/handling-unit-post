@@ -9,62 +9,82 @@ annotate service.HandlingUnits {
 
 
 annotate service.HandlingUnits with @(UI: {
-SelectionFields  : [
-    EWMWarehouse,
-    MaterialNumber,
-    HUNumber,
-    HUStatus
-],
+    SelectionFields: [
+        EWMWarehouse,
+        MaterialNumber,
+        HUNumber,
+        HUStatus
+    ],
 
-LineItem: [
-    {
-        $Type: 'UI.DataField',
-        Value: HUNumber,
-        ![@HTML5.CssDefaults] : {
-            $Type : 'HTML5.CssDefaultsType',
-            width : '12rem',
+    LineItem       : [
+        {
+            $Type                : 'UI.DataField',
+            Value                : HUNumber,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '12rem',
+            },
         },
-    },
-    {
-        $Type: 'UI.DataField',
-        Value: PackagingMaterial,
-        ![@HTML5.CssDefaults] : {
-            $Type : 'HTML5.CssDefaultsType',
-            width : '10rem',
+        {
+            $Type                : 'UI.DataField',
+            Value                : PackagingMaterial,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '10rem',
+            },
         },
-    },
-    {
-        $Type: 'UI.DataField',
-        Value: MaterialNumber,
-        ![@HTML5.CssDefaults] : {
-            $Type : 'HTML5.CssDefaultsType',
-            width : '12rem',
+        {
+            $Type                : 'UI.DataField',
+            Value                : MaterialNumber,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '12rem',
+            },
         },
-    },
-    {
-        $Type: 'UI.DataField',
-        Value: QuantityPerHU,
-        ![@HTML5.CssDefaults] : {
-            $Type : 'HTML5.CssDefaultsType',
-            width : '6rem',
+        {
+            $Type                : 'UI.DataField',
+            Value                : QuantityPerHU,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '6rem',
+            },
         },
-    },
-    {
-        $Type: 'UI.DataField',
-        Value: CreationDate,
-        ![@HTML5.CssDefaults] : {
-            $Type : 'HTML5.CssDefaultsType',
-            width : '6rem',
+        {
+            $Type                : 'UI.DataField',
+            Value                : CreationDate,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '6rem',
+            },
         },
-    },
-    {
-        $Type: 'UI.DataField',
-        Value: ProductionOrder,
-        ![@HTML5.CssDefaults] : {
-            $Type : 'HTML5.CssDefaultsType',
-            width : '8rem',
-        },
-    }
-], }
+        {
+            $Type                : 'UI.DataField',
+            Value                : ProductionOrder,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '8rem',
+            },
+        }
+    ],
+});
 
-);
+annotate service.StorageBins with @(UI: {
+    LineItem       : [
+        {
+            $Type                : 'UI.DataField',
+            Value                : EWMStorageBin,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '12rem',
+            },
+        },
+        {
+            $Type                : 'UI.DataField',
+            Value                : EWMStorageType,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '12rem',
+            },
+        },
+    ],
+});

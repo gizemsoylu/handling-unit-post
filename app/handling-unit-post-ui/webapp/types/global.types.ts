@@ -4,6 +4,16 @@ export enum ApplicationModels {
     DEFAULT_ODATA = "",
 }
 
+export enum DefaultMessages {
+    NO_I18N_TEXT = "The message could not be displayed due to technical issues. Contact the administrator."
+}
+
 export interface IBindingParams {
-    filters:Filter[]
+    filters: Filter[]
+}
+
+export interface IStorageBins {
+    EWMWarehouse: string;
+    EWMStorageBin: string;
+    EWMStorageType: string;
 }

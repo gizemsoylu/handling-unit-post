@@ -4,7 +4,7 @@ import Controller from "sap/ui/core/mvc/Controller";
 import Router from "sap/ui/core/routing/Router";
 import Model from "sap/ui/model/Model";
 import ResourceModel from "sap/ui/model/resource/ResourceModel";
-import { ApplicationModels } from "../types/global.types";
+import { ApplicationModels, DefaultMessages } from "../types/global.types";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import View from "sap/ui/core/mvc/View";
 
@@ -40,5 +40,10 @@ export default class BaseController extends Controller {
 
     public getResourceBundle(): ResourceBundle {
         return (((this.getOwnerComponent() as UIComponent).getModel("i18n") as ResourceModel).getResourceBundle() as ResourceBundle);
+    }
+
+    public getResourceBundleText(key: string, parameters?: any[]): string {
+        const resourceBundle = this.getResourceBundle();
+        return resourceBundle.getText(key, parameters, true) || DefaultMessages.NO_I18N_TEXT;
     }
 } 

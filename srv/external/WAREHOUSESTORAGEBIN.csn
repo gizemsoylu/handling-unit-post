@@ -4,7 +4,7 @@
  },
  "$version": "2.0",
  "definitions": {
-  "WAREHOUSESTORAGEBIN_0001": {
+  "WAREHOUSESTORAGEBIN": {
    "kind": "service",
    "@cds.external": true,
    "@CodeList.UnitsOfMeasure": {
@@ -92,7 +92,7 @@
     }
    ]
   },
-  "WAREHOUSESTORAGEBIN_0001.WarehouseStorageBin": {
+  "WAREHOUSESTORAGEBIN.WarehouseStorageBin": {
    "kind": "entity",
    "@cds.external": true,
    "@cds.persistence.skip": true,

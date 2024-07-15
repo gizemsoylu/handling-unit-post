@@ -6,10 +6,13 @@ using {
 service HandlingUnitPost {
     @cds.redirection.target: true
     entity HandlingUnits as projection on DBHandlingUnits;
-    @readonly
-    entity VHStatus as select distinct key HUStatus from DBHandlingUnits;
 
-    function getStorageLocation(EWMWarehouse : String) returns array of {
+    entity StorageBins   as projection on DBStorageBins;
+
+    @readonly
+    entity VHStatus      as select distinct key HUStatus from DBHandlingUnits;
+
+    function getStorageBins(EWMWarehouse : String) returns array of {
         EWMWarehouse : String;
         EWMStorageBin : String;
         EWMStorageType : String

@@ -83,18 +83,11 @@ export default class DataOperations {
                 if (hasChild) {
                     const allSameMaterial = childNodes.every(child => child.MaterialNumber === childNodes[0].MaterialNumber);
                     const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
-                    if (allSameMaterial) {
-                        node.MaterialNumber = childNodes[0].MaterialNumber;
-                        node.QuantityPerHU = childNodes.reduce((sum, child) => sum + (child.QuantityPerHU || 0), 0);
-                    } else {
-                        node.MaterialNumber = "Multiple Materials";
-                        node.QuantityPerHU = null;
-                    }
-                    if (allSameStatus) {
-                        node.HUStatus = childNodes[0].HUStatus;
-                    } else {
-                        node.HUStatus = "";
-                    }
+                    const allIsCompleted = childNodes.every(child => child.EWMHUProcessStepIsCompleted === childNodes[0].EWMHUProcessStepIsCompleted);
+                    node.MaterialNumber = allSameMaterial ? childNodes[0].MaterialNumber : node.MaterialNumber = "Multiple Materials";
+                    node.HUStatus = allSameStatus ? childNodes[0].HUStatus : ""
+                    node.QuantityPerHU = allSameMaterial ? childNodes.reduce((sum, child) => sum + (child.QuantityPerHU || 0), 0) : null
+                    node.EWMHUProcessStepIsCompleted = allIsCompleted ? childNodes[0].EWMHUProcessStepIsCompleted : false;
                 }
             }
         });

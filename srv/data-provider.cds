@@ -4,6 +4,10 @@ using {
 } from '../db/data-models';
 
 service HandlingUnitPost {
+    /********************************************************************************************************/
+    /* Composite or Table Views                                                                             */
+    /********************************************************************************************************/
+
     @cds.redirection.target: true
     entity HandlingUnits as projection on DBHandlingUnits;
 
@@ -12,9 +16,21 @@ service HandlingUnitPost {
     @readonly
     entity VHStatus      as select distinct key HUStatus from DBHandlingUnits;
 
+    /********************************************************************************************************/
+    /* Action - Function Imports                                                                            */
+    /********************************************************************************************************/
+
+    action   moveHUtoBin(EWMWarehouse : String,
+                         SourceHandlingUnit : String,
+                         WarehouseProcessType : String,
+                         DestinationStorageType : String,
+                         DestinationStorageBin : String);
+
     function getStorageBins(EWMWarehouse : String) returns array of {
         EWMWarehouse : String;
         EWMStorageBin : String;
         EWMStorageType : String
-    }
+    };
+
+
 }

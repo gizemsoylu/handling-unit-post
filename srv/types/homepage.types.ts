@@ -44,7 +44,7 @@ export interface IHandlingUnitItems {
     DrillState: string;
     CreationDate: Date | null;
     CreationDateTime: Date | null;
-    EWMWarehouse:string;
+    EWMWarehouse: string;
 }
 
 export interface IStorageBins {
@@ -57,3 +57,4 @@ export interface IWhereClause {
     ref: string[];
     val: number | string | Date | null;
 }
+

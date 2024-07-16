@@ -19,13 +19,18 @@ annotate service.StorageBins {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'StorageBins',
         SearchSupported,
-        Parameters    : [{
-            $Type            : 'Common.ValueListParameterInOut',
-            LocalDataProperty: EWMStorageBin,
-            ValueListProperty: 'EWMStorageBin',
-        }]
+        Parameters    : [
+            {
+                $Type            : 'Common.ValueListParameterInOut',
+                LocalDataProperty: EWMStorageBin,
+                ValueListProperty: 'EWMStorageBin',
+            },
+            {
+                $Type            : 'Common.ValueListParameterDisplayOnly',
+                ValueListProperty: 'EWMStorageType',
+            },
+        ]
     };
 
     EWMWarehouse  @Common          : {FilterDefaultValue: '1200'}
-
 }

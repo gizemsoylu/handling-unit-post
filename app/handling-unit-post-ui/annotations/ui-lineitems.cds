@@ -64,6 +64,22 @@ annotate service.HandlingUnits with @(UI: {
                 $Type: 'HTML5.CssDefaultsType',
                 width: '8rem',
             },
+        },
+        {
+            $Type                : 'UI.DataField',
+            Value                : EWMStorageBin,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '6rem',
+            },
+        },
+        {
+            $Type                : 'UI.DataField',
+            Value                : EWMHUProcessStepIsCompleted,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '6rem',
+            },
         }
     ],
 });

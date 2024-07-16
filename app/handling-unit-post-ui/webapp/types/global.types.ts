@@ -17,3 +17,11 @@ export interface IStorageBins {
     EWMStorageBin: string;
     EWMStorageType: string;
 }
+
+export interface IMoveHUtoBin {
+    EWMWarehouse: string;
+    SourceHandlingUnit: string;
+    WarehouseProcessType: string;
+    DestinationStorageType: string;
+    DestinationStorageBin: string;
+}

@@ -17,19 +17,16 @@
         <f:ShellBar
             title="{i18n>homepage}"
             homeIcon="./img/sap_logo.png"
-            showSearch="true"
-            showNotifications="true"
+            showSearch="false"
+            showNotifications="false"
         >
-            <f:profile>
-                <Avatar initials="UI" />
-            </f:profile>
         </f:ShellBar>
 
         <FlexBox
             justifyContent="Center"
             alignItems="Center"
         >
-            <VBox width="95%">
+            <VBox width="95%" class="sapUiSmallMarginTop">
                 <smartFilterBar:SmartFilterBar
                     id="sfbHandlingUnit"
                     entitySet="HandlingUnits"

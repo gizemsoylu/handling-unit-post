@@ -13,6 +13,7 @@ export default class HandlingUnitPost extends ApplicationService {
         this.on("READ", "VHStatus", getHandlingUnitStatus);
         this.on("READ", "StorageBins", getStorageBins);
         this.on("getStorageBins", getEWMWarehouseBins);
+        this.on("moveHUtoBin", moveHandlingUnits);
 
         return super.init();
     }

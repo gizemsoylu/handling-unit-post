@@ -10,3 +10,7 @@ using from './handling-unit-post-ui/annotations/ui-labels';
  * VALUE LIST                                                  *
  ***************************************************************/
 using from './handling-unit-post-ui/annotations/ui-valuelists';
+/***************************************************************
+ * TEXT ARRANGEMENT                                                  *
+ ***************************************************************/
+using from './handling-unit-post-ui/annotations/ui-textarrangements';

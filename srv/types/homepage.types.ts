@@ -53,6 +53,14 @@ export interface IStorageBins {
     EWMStorageType: string;
 }
 
+export interface IMoveStorageBins {
+    WarehouseProcessType : string;
+    SourceHandlingUnit : string;
+    EWMWarehouse : string;
+    DestinationStorageType : string;
+    DestinationStorageBin : string;
+}
+
 export interface IWhereClause {
     ref: string[];
     val: number | string | Date | null;

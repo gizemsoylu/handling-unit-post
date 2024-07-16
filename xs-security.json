@@ -8,7 +8,12 @@
     "redirect-uris": [
       "https://port1299-workspaces-ws-wjz4t.eu10.applicationstudio.cloud.sap/login/callback", 
       "https://*.us10-001.hana.ondemand.com/**",
-      "http://localhost:1299/login/callback"
+      "http://localhost:1299/login/callback",
+      "https://*.eu10-004.hana.ondemand.com/**",
+      "https://*.eu10.hana.ondemand.com/**"
+    ],
+    "allowedproviders": [
+      "sap.custom"
     ]
   }
 }

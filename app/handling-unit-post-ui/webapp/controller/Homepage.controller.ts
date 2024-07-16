@@ -16,6 +16,12 @@ import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import { smartfield } from "sap/ui/comp/library";
 import { Table$RowSelectionChangeEvent } from "sap/ui/table/Table";
+import ValueHelpCL from "ui5/antares/ui/ValueHelpCL";
+import ValueHelpDialog from "sap/ui/comp/valuehelpdialog/ValueHelpDialog";
+import Input from "sap/m/Input";
+import ODataReadCL from "ui5/antares/odata/v2/ODataReadCL";
+import Filter from "sap/ui/model/Filter";
+import FilterOperator from "sap/ui/model/FilterOperator";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -25,6 +31,7 @@ export default class Homepage extends BaseController {
     private entry: EntryCreateCL;
     private EWMWarehouse: string;
     private HUNumber: string;
+    private EWMStorageBin: string;
 
     /* ======================================================================================================================= */
     /* Lifecycle methods                                                                                                       */
@@ -64,9 +71,35 @@ export default class Homepage extends BaseController {
             this.entry.setUseMetadataLabels(true);
             this.entry.setDisableAutoClose(true);
             this.entry.setAutoMandatoryCheck(true);
-            this.entry.setFormType(FormTypes.SMART);
+            this.entry.setFormType(FormTypes.SIMPLE);
             this.entry.registerManualSubmit(this.onMoveHUManualSubmit, this);
             this.entry.attachSubmitCompleted(this.onMoveHUSubmitCompleted, this);
+
+            const storageBinVH = new ValueHelpCL(this, {
+                useMetadataLabels:true,
+                propertyName: "EWMStorageBin",
+                valueHelpEntity: "StorageBins",
+                valueHelpProperty: "EWMStorageBin",
+                readonlyProperties: ["EWMStorageType", "EWMWarehouse"],
+                filterCaseSensitive: true,
+                title: this.getResourceBundleText("selectBin")
+            });
+
+            this.entry.addValueHelp(storageBinVH);
+
+            storageBinVH.setInitialFilters([{
+                propertyName: "EWMWarehouse",
+                value: this.EWMWarehouse
+            }])
+
+            storageBinVH.attachAfterDialogOpened((dialog: ValueHelpDialog) => {
+                const filterItems = dialog.getFilterBar().getFilterGroupItems();
+                filterItems.forEach((item) => {
+                    if (item.getName() === "EWMWarehouse") {
+                        (item.getControl() as Input).setEditable(false)
+                    }
+                })
+            }, this)
 
             this.entry.createNewEntry({
                 EWMWarehouse: this.EWMWarehouse
@@ -79,6 +112,17 @@ export default class Homepage extends BaseController {
     /* ======================================================================================================================= */
     /* Internal Handlers                                                                                                       */
     /* ======================================================================================================================= */
+    
+    private async onHUSelectionChange(event: Table$RowSelectionChangeEvent) {
+        const rowContext = event.getParameter("rowContext") as Context;
+        const rowIndex = event.getParameter("rowIndex") as number;
+        const table = this.byId("uiTreeHandlingUnit") as TreeTable;
+        const parentNodeID=(rowContext.getObject() as {ParentNodeID: string}).ParentNodeID
+
+        if(parentNodeID){
+            table.removeSelectionInterval(rowIndex,rowIndex);
+        }
+    }
 
     private onMoveHUSubmitCompleted(response: ResponseCL<ISubmitResponse>) {
         MessageToast.show(this.getResourceBundle().getText("successMessage") as string);
@@ -88,23 +132,27 @@ export default class Homepage extends BaseController {
     private async onMoveHUManualSubmit(entry: EntryCreateCL) {
         const odata = new ODataCreateCL<IMoveHUtoBin>(this, "moveHUtoBin");
         const path = (entry.getEntryContext() as Context).getPath();
-        const EWMStorageBin = (this.getODataModel() as ODataModel).getProperty(path).EWMStorageBin;
+        this.EWMStorageBin = (this.getODataModel() as ODataModel).getProperty(path).EWMStorageBin;
+        const EWMStorageType = await this.getStorageType(this.EWMStorageBin);
 
         odata.setData({
             EWMWarehouse: this.EWMWarehouse,
             SourceHandlingUnit: this.HUNumber,
-            DestinationStorageBin: EWMStorageBin,
-            DestinationStorageType: "S910",
-            WarehouseProcessType: "S400",
+            DestinationStorageBin: this.EWMStorageBin,
+            DestinationStorageType: EWMStorageType,
+            WarehouseProcessType: "ZRF1",
         });
 
         await odata.create();
         this.entry.closeAndDestroyEntryDialog();
     }
 
-    private async onHUSelectionChange(event: Table$RowSelectionChangeEvent) {
-        const rowContext = event.getParameter("rowContext") as Context;
-        const level = (rowContext.getObject() as { HierarchyLevel: number }).HierarchyLevel;
-        const path = rowContext.getPath();
+    private async getStorageType(EWMStorageBin:string){
+        const odata = new ODataReadCL<IStorageBins>(this,"StorageBins")
+        odata.addFilter(new Filter("EWMWarehouse", FilterOperator.EQ, this.EWMWarehouse));
+        odata.addFilter(new Filter("EWMStorageBin", FilterOperator.EQ, this.EWMStorageBin));
+        const storageBins = await odata.read();
+        return storageBins[0].EWMStorageType
     }
+
 }

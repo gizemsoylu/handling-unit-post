@@ -42,6 +42,6 @@
     ]
   },
   "dependencies": {
-    "ui5-antares": "^1.124.999003"
+    "ui5-antares": "^1.124.999005"
   }
 }

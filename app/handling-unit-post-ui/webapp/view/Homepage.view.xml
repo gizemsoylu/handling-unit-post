@@ -49,6 +49,7 @@
                     editTogglable="false"
                     app:useSmartToggle="false"
                     showFullScreenButton="true"
+                    requestAtLeastFields="NodeID,HierarchyLevel"
                 >
                     <smartTable:customToolbar>
                         <OverflowToolbar design="Transparent">

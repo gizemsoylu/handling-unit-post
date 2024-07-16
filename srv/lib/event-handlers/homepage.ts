@@ -1,5 +1,5 @@
 import { OnEventHandler, TypedRequest, connect, operator } from "@sap/cds";
-import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins } from "../../types/homepage.types";
+import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IMoveStorageBins } from "../../types/homepage.types";
 import FilterOperations from "../util/FilterOperations";
 import DataOperations from "../util/DataOperations";
 
@@ -34,7 +34,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         const filters = req.query.SELECT.where as unknown as IWhereClause[];
         nodeList = filterOperations.filterNodeList(nodeList, filters);
     }
-
+    
     nodeList.$count = nodeList.length;
     return nodeList;
 };
@@ -74,9 +74,14 @@ const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<
     return formattedStatuses;
 }
 
-const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<{ EWMStorageBin: string }>): Promise<void> {
-    const EWMStorageBin = req.data.EWMStorageBin;
-    debugger;
+const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMoveStorageBins>): Promise<void> {
+    const DestinationStorageBin = req.data.DestinationStorageBin;
+    const DestinationStorageType = req.data.DestinationStorageType;
+    const SourceHandlingUnit = req.data.SourceHandlingUnit;
+    const WarehouseProcessType = req.data.WarehouseProcessType;
+    const EWMWarehouse = req.data.EWMWarehouse;
+
+
 }
 
 

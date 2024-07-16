@@ -32,5 +32,5 @@ annotate service.StorageBins {
         ]
     };
 
-    EWMWarehouse  @Common          : {FilterDefaultValue: '1200'}
+    // EWMWarehouse  @Common          : {FilterDefaultValue: '1200'}
 }

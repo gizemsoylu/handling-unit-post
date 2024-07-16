@@ -15,6 +15,7 @@ import Context from "sap/ui/model/Context";
 import ODataCreateCL from "ui5/antares/odata/v2/ODataCreateCL";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import { smartfield } from "sap/ui/comp/library";
+import { Table$RowSelectionChangeEvent } from "sap/ui/table/Table";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -59,7 +60,7 @@ export default class Homepage extends BaseController {
             this.entry.setTextInEditModeSource([{
                 propertyName: "EWMStorageBin",
                 textInEditModeSource: smartfield.TextInEditModeSource.ValueList
-            }]); 
+            }]);
             this.entry.setUseMetadataLabels(true);
             this.entry.setDisableAutoClose(true);
             this.entry.setAutoMandatoryCheck(true);
@@ -99,5 +100,11 @@ export default class Homepage extends BaseController {
 
         await odata.create();
         this.entry.closeAndDestroyEntryDialog();
+    }
+
+    private async onHUSelectionChange(event: Table$RowSelectionChangeEvent) {
+        const rowContext = event.getParameter("rowContext") as Context;
+        const level = (rowContext.getObject() as { HierarchyLevel: number }).HierarchyLevel;
+        const path = rowContext.getPath();
     }
 }

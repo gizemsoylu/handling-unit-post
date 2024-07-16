@@ -19,19 +19,21 @@
             homeIcon="./img/sap_logo.png"
             showSearch="false"
             showNotifications="false"
-        >
-        </f:ShellBar>
+        />
 
         <FlexBox
             justifyContent="Center"
             alignItems="Center"
         >
-            <VBox width="95%" class="sapUiSmallMarginTop">
+            <VBox
+                width="95%"
+                class="sapUiSmallMarginTop"
+            >
                 <smartFilterBar:SmartFilterBar
                     id="sfbHandlingUnit"
                     entitySet="HandlingUnits"
                     useProvidedNavigationProperties="true"
-                    enableBasicSearch="true"
+                    enableBasicSearch="false"
                 />
                 <smartTable:SmartTable
                     id="stHandlingUnit"
@@ -52,8 +54,9 @@
                         <OverflowToolbar design="Transparent">
                             <ToolbarSpacer />
                             <Button
-                                text="{i18n>post}"
+                                text="{i18n>moveHU}"
                                 type="Emphasized"
+                                icon="sap-icon://journey-depart"
                                 press="onMoveHandlingUnit"
                             />
                         </OverflowToolbar>
@@ -61,7 +64,12 @@
                     <smartTable:layoutData>
                         <FlexItemData growFactor="1" />
                     </smartTable:layoutData>
-                    <table:TreeTable id="uiTreeHandlingUnit" selectionMode="Single">
+                    <table:TreeTable
+                        id="uiTreeHandlingUnit"
+                        selectionMode="Single"
+                        rowSelectionChange="onHUSelectionChange"
+                        threshold="20"
+                    >
                         <table:rowSettingsTemplate>
                             <table:RowSettings
                                 highlight="{path: 'HUStatus', formatter: '.formatter.setStatusHighlight'}"

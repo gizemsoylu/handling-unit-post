@@ -7,6 +7,9 @@ import ResourceModel from "sap/ui/model/resource/ResourceModel";
 import { ApplicationModels, DefaultMessages } from "../types/global.types";
 import ODataModel from "sap/ui/model/odata/v2/ODataModel";
 import View from "sap/ui/core/mvc/View";
+import Button, { Button$PressEvent } from "sap/m/Button";
+import FragmentCL from "ui5/antares/ui/FragmentCL";
+import Messaging from "sap/ui/core/Messaging";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -46,4 +49,18 @@ export default class BaseController extends Controller {
         const resourceBundle = this.getResourceBundle();
         return resourceBundle.getText(key, parameters, true) || DefaultMessages.NO_I18N_TEXT;
     }
+
+    public openMessagePopover(): void {
+        const view = this.getView() as View;
+        (view.byId("btnMessages") as Button).firePress();
+    } 
+    
+    public onMessagePopoverPress(event: Button$PressEvent): void {
+        const fragment = new FragmentCL(this, "com.ndbs.handlingunitpostui.fragments.MessagePopover", event.getSource());
+        fragment.openAsync(true);
+    }
+
+    public onClearMessages(): void {
+        Messaging.removeAllMessages();
+    }   
 } 

@@ -13,9 +13,6 @@ service HandlingUnitPost {
 
     entity StorageBins   as projection on DBStorageBins;
 
-    @readonly
-    entity VHStatus      as select distinct key HUStatus from DBHandlingUnits;
-
     /********************************************************************************************************/
     /* Action - Function Imports                                                                            */
     /********************************************************************************************************/
@@ -32,5 +29,22 @@ service HandlingUnitPost {
         EWMStorageType : String
     };
 
+    /********************************************************************************************************/
+    /* ValueHelp Views                                                                        */
+    /********************************************************************************************************/
+    @readonly
+    entity VHStatus      as select distinct key HUStatus from DBHandlingUnits;
+
+    @readonly
+    entity VHWarehouses as select distinct key EWMWarehouse from DBHandlingUnits;
+    
+    @readonly
+    entity VHHUNumbers as select distinct key HUNumber from DBHandlingUnits;
+
+    @readonly
+    entity VHMaterials as select distinct key MaterialNumber from DBHandlingUnits;
+
+    @readonly
+    entity VHOrders as select distinct key ProductionOrder  from DBHandlingUnits;
 
 }

@@ -11,8 +11,9 @@ annotate service.HandlingUnits {
 annotate service.HandlingUnits with @(UI: {
     SelectionFields: [
         EWMWarehouse,
-        MaterialNumber,
         HUNumber,
+        MaterialNumber,
+        ProductionOrder,
         HUStatus
     ],
 

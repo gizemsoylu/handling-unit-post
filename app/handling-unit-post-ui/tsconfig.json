@@ -12,7 +12,7 @@
       "outDir": "./dist",
       "baseUrl": "./",
       "paths": {
-        "com/ndbs/issmasshireui/*": [
+        "com/ndbs/handlingunitpostui/*": [
           "./webapp/*"
         ]
       },

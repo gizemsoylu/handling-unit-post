@@ -2,7 +2,7 @@ using HandlingUnitPost as service from '../../../srv/data-provider';
 
 annotate service.HandlingUnits {
     @Common.ValueListWithFixedValues: true
-    HUStatus @Common.ValueList: {
+    HUStatus        @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHStatus',
         SearchSupported,
@@ -10,6 +10,50 @@ annotate service.HandlingUnits {
             $Type            : 'Common.ValueListParameterInOut',
             LocalDataProperty: HUStatus,
             ValueListProperty: 'HUStatus'
+        }]
+    };
+
+    EWMWarehouse    @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'VHWarehouses',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: EWMWarehouse,
+            ValueListProperty: 'EWMWarehouse'
+        }]
+    };
+
+    HUNumber        @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'VHHUNumbers',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: HUNumber,
+            ValueListProperty: 'HUNumber'
+        }]
+    };
+
+    MaterialNumber  @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'VHMaterials',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: MaterialNumber,
+            ValueListProperty: 'MaterialNumber'
+        }]
+    };
+
+    ProductionOrder @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'VHOrders',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: ProductionOrder,
+            ValueListProperty: 'ProductionOrder'
         }]
     };
 }
@@ -31,6 +75,4 @@ annotate service.StorageBins {
             },
         ]
     };
-
-    // EWMWarehouse  @Common          : {FilterDefaultValue: '1200'}
 }

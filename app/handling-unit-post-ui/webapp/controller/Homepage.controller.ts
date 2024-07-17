@@ -5,7 +5,7 @@ import { Button$ClickEvent } from "sap/ui/webc/main/Button";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import MessageBox from "sap/m/MessageBox";
-import { IStorageBins, IMoveHUtoBin } from "../types/global.types";
+import { IStorageBins, IMoveHUtoBin, IFailedResponse, Routes } from "../types/global.types";
 import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
 import MessageToast from "sap/m/MessageToast";
 import { ISubmitResponse } from "ui5/antares/types/entry/submit";
@@ -22,6 +22,12 @@ import Input from "sap/m/Input";
 import ODataReadCL from "ui5/antares/odata/v2/ODataReadCL";
 import Filter from "sap/ui/model/Filter";
 import FilterOperator from "sap/ui/model/FilterOperator";
+import Messaging from "sap/ui/core/Messaging";
+import Message from "sap/ui/core/message/Message";
+import MessageType from "sap/ui/core/message/MessageType";
+import { Model$RequestFailedEvent } from "sap/ui/model/Model";
+import PageCL from "../util/PageCL";
+import SmartTable from "sap/ui/comp/smarttable/SmartTable";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -38,7 +44,8 @@ export default class Homepage extends BaseController {
     /* ======================================================================================================================= */
 
     public onInit(): void {
-
+        const page = new PageCL<Homepage>(this, Routes.HOMEPAGE);
+        page.initialize();
     }
 
     /* ======================================================================================================================= */
@@ -70,13 +77,12 @@ export default class Homepage extends BaseController {
             }]);
             this.entry.setUseMetadataLabels(true);
             this.entry.setDisableAutoClose(true);
-            this.entry.setAutoMandatoryCheck(true);
             this.entry.setFormType(FormTypes.SIMPLE);
             this.entry.registerManualSubmit(this.onMoveHUManualSubmit, this);
-            this.entry.attachSubmitCompleted(this.onMoveHUSubmitCompleted, this);
+            this.entry.attachSubmitFailed(this.onMoveHUSubmitFailed, this)
 
             const storageBinVH = new ValueHelpCL(this, {
-                useMetadataLabels:true,
+                useMetadataLabels: true,
                 propertyName: "EWMStorageBin",
                 valueHelpEntity: "StorageBins",
                 valueHelpProperty: "EWMStorageBin",
@@ -112,47 +118,73 @@ export default class Homepage extends BaseController {
     /* ======================================================================================================================= */
     /* Internal Handlers                                                                                                       */
     /* ======================================================================================================================= */
-    
+
+    public onObjectMatched(): void {
+        const oDataModel = this.getComponentModel();
+        oDataModel.attachRequestFailed({}, this.onODataRequestFail, this);
+    }
+
+    public onODataRequestFail(event: Model$RequestFailedEvent): void {
+        this.openMessagePopover();
+    }
+
     private async onHUSelectionChange(event: Table$RowSelectionChangeEvent) {
         const rowContext = event.getParameter("rowContext") as Context;
         const rowIndex = event.getParameter("rowIndex") as number;
         const table = this.byId("uiTreeHandlingUnit") as TreeTable;
-        const parentNodeID=(rowContext.getObject() as {ParentNodeID: string}).ParentNodeID
+        const parentNodeID = (rowContext.getObject() as { ParentNodeID: string }).ParentNodeID
 
-        if(parentNodeID){
-            table.removeSelectionInterval(rowIndex,rowIndex);
-        }
+        if (parentNodeID) {
+            table.removeSelectionInterval(rowIndex, rowIndex);        }
     }
 
-    private onMoveHUSubmitCompleted(response: ResponseCL<ISubmitResponse>) {
-        MessageToast.show(this.getResourceBundle().getText("successMessage") as string);
+    private onMoveHUSubmitFailed(response: ResponseCL<ISubmitResponse>) {
         this.entry.closeAndDestroyEntryDialog();
     }
 
     private async onMoveHUManualSubmit(entry: EntryCreateCL) {
+        BusyIndicator.show(0);
         const odata = new ODataCreateCL<IMoveHUtoBin>(this, "moveHUtoBin");
         const path = (entry.getEntryContext() as Context).getPath();
         this.EWMStorageBin = (this.getODataModel() as ODataModel).getProperty(path).EWMStorageBin;
-        const EWMStorageType = await this.getStorageType(this.EWMStorageBin);
+        
+        if (!this.EWMStorageBin) {
+            BusyIndicator.hide();
+            MessageBox.error(this.getResourceBundleText("noSelectedStorageBins"));
+        } else {
+            const EWMStorageType = await this.getStorageType(this.EWMStorageBin);
 
-        odata.setData({
-            EWMWarehouse: this.EWMWarehouse,
-            SourceHandlingUnit: this.HUNumber,
-            DestinationStorageBin: this.EWMStorageBin,
-            DestinationStorageType: EWMStorageType,
-            WarehouseProcessType: "ZRF1",
-        });
+            odata.setData({
+                EWMWarehouse: this.EWMWarehouse,
+                SourceHandlingUnit: this.HUNumber,
+                DestinationStorageBin: this.EWMStorageBin,
+                DestinationStorageType: EWMStorageType,
+                WarehouseProcessType: "ZRF1",
+            });
 
-        await odata.create();
-        this.entry.closeAndDestroyEntryDialog();
+            try {
+                await odata.create();
+                BusyIndicator.hide();
+                Messaging.addMessages(new Message({
+                    message: this.getResourceBundleText("taskCreated"),
+                    type: MessageType.Success
+                }));
+                (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);
+                this.entry.closeAndDestroyEntryDialog();
+                this.openMessagePopover();
+            } catch (error: unknown) {
+                BusyIndicator.hide();
+                this.entry.closeAndDestroyEntryDialog();
+                this.openMessagePopover();
+            }
+        }
     }
 
-    private async getStorageType(EWMStorageBin:string){
-        const odata = new ODataReadCL<IStorageBins>(this,"StorageBins")
+    private async getStorageType(EWMStorageBin: string) {
+        const odata = new ODataReadCL<IStorageBins>(this, "StorageBins")
         odata.addFilter(new Filter("EWMWarehouse", FilterOperator.EQ, this.EWMWarehouse));
         odata.addFilter(new Filter("EWMStorageBin", FilterOperator.EQ, this.EWMStorageBin));
         const storageBins = await odata.read();
         return storageBins[0].EWMStorageType
     }
-
 }

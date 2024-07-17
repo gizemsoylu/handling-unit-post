@@ -56,7 +56,7 @@ export default class FilterOperations {
         }
     }
 
-    public sortNodes(nodeList: IHandlingUnitsArray, orderBy: IOrderByClause): IHandlingUnitsArray {
+    public sortNodes(nodeList: IHandlingUnitsArray, orderBy: IOrderByClause[]): IHandlingUnitsArray {
         const sortedNodes = [...nodeList];
         orderBy.reverse().forEach(order => {
             const property = order.ref[0];

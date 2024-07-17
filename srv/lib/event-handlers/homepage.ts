@@ -35,11 +35,10 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     }
 
     if (req.query.SELECT?.orderBy) {
-        const orderBy = req.query.SELECT.orderBy as unknown as IOrderByClause;
+        const orderBy = req.query.SELECT.orderBy as unknown as IOrderByClause[];
         nodeList = filterOperations.sortNodes(nodeList, orderBy);
     }
     
-    nodeList.sort((a, b) => a.HUNumber.localeCompare(b.HUNumber));
     nodeList.$count = nodeList.length;
     return nodeList;
 };

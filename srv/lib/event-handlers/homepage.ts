@@ -15,7 +15,6 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     let nodeList: IHandlingUnitsArray = [];
     let nodeId = 1;
 
-
     huPallets.forEach((huItems: IHandlingUnitItems) => {
         huItems = dataOperations.formatHUItems(huItems);
 
@@ -35,7 +34,11 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         nodeList = filterOperations.filterNodeList(nodeList, filters);
     }
 
-    nodeList.sort((a, b) => a.HUNumber.localeCompare(b.HUNumber));
+    if (req.query.SELECT?.orderBy) {
+        const orderBy = req.query.SELECT.orderBy;
+        nodeList = filterOperations.sortNodes(nodeList, orderBy);
+    }
+
     nodeList.$count = nodeList.length;
     return nodeList;
 };

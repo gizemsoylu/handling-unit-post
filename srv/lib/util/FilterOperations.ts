@@ -16,4 +16,30 @@ export default class FilterOperations {
         filteredNodeList.$count = filteredNodeList.length;
         return filteredNodeList;
     }
+
+    public sortNodes(nodeList: IHandlingUnitsArray, orderBy): IHandlingUnitsArray {
+        const sortedNodes = [...nodeList];
+        orderBy.reverse().forEach(order => {
+            const property = order.ref[0];
+            const sortOrder = order.sort;
+            sortedNodes.sort(this.dynamicSort(property, sortOrder));
+        });
+        return sortedNodes;
+    }
+
+    private dynamicSort(property: string, order: string) {
+        const sortOrder = order === 'desc' ? -1 : 1;
+        return function (a: any, b: any) {
+            const aValue = a[property];
+            const bValue = b[property];
+
+            if (aValue < bValue) {
+                return -1 * sortOrder;
+            }
+            if (aValue > bValue) {
+                return 1 * sortOrder;
+            }
+            return 0;
+        };
+    }
 }

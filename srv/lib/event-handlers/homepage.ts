@@ -1,5 +1,5 @@
 import { OnEventHandler, TypedRequest, connect, operator } from "@sap/cds";
-import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IMoveStorageBins } from "../../types/homepage.types";
+import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IMoveStorageBins, IOrderByClause } from "../../types/homepage.types";
 import FilterOperations from "../util/FilterOperations";
 import DataOperations from "../util/DataOperations";
 
@@ -35,7 +35,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     }
 
     if (req.query.SELECT?.orderBy) {
-        const orderBy = req.query.SELECT.orderBy;
+        const orderBy = req.query.SELECT.orderBy as unknown as IOrderByClause;
         nodeList = filterOperations.sortNodes(nodeList, orderBy);
     }
 

@@ -66,3 +66,9 @@ export interface IWhereClause {
     val: number | string | Date | null;
 }
 
+export interface IOrderByClause {
+    [x: string]: any;
+    ref: string[];
+    sort: 'asc' | 'desc';
+}
+

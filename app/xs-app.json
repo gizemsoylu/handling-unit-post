@@ -1,10 +1,10 @@
 {
   "authenticationMethod": "route",
-  "welcomeFile": "comndbshandlingunitpostui",
+  "welcomeFile": "/comndbshandlingunitpostui",
   "routes": [
     {
       "source": "^/odata/v2/handling-unit-post/(.*)$",
-      "destination": "backend-api",
+      "destination": "srv-api",
       "authenticationType": "xsuaa"
     }
   ]

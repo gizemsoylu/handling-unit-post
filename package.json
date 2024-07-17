@@ -89,8 +89,5 @@
     "cov2ap": {
       "plugin": true
     }
-  },
-  "sapux": [
-    "app/handling-unit-post-ui"
-  ]
+  }
 }

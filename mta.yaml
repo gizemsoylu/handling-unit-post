@@ -11,23 +11,16 @@ modules:
   path: gen/srv
   requires:
     - name: handling-unit-post-auth
-    - name: handling-unit-post-dest
+    - name: handling-unit-post-destination-service
   parameters:
-    readiness-health-check-http-endpoint: /health
-    readiness-health-check-type: http
     buildpack: nodejs_buildpack
   provides:
     - name: srv-api
       properties:
         srv-url: ${default-url}
   build-parameters:
-    builder: npm
-    ignore:
-    - default-env.json
-    - .env
-    - '**/*.ts'
-    - srv/**/*.ts
-    - srv/lib/**/*.ts
+    builder: npm-ci
+    ignore: ["default-env.json", ".env", "**/*.ts", "srv/**/*.ts", "srv/lib/**/*.ts"]
 
 # ============================= Approuter Module ==============================
 - name: handling-unit-post-app
@@ -35,37 +28,40 @@ modules:
   type: approuter.nodejs
   path: app
   requires:
-    - name: handling-unit-post-auth
+    - name: handling-unit-post-destination-service
     - name: handling-unit-post-repo-runtime
+    - name: handling-unit-post-auth
     - name: srv-api
       group: destinations
       properties:
-        name: backend-api 
+        name: srv-api 
         url: ~{srv-url}
         forwardAuthToken: true
   parameters:
-    keep-existing-routes: true
     disk-quota: 1024M
     memory: 1024M
+  properties:
+    SESSION_TIMEOUT: 30
+    INCOMING_CONNECTION_TIMEOUT: 0
+    npm_config_cache: .npmcache
+    npm_config_prefer_offline: true      
 
-# ============================= App Content ===================================
-- name: handling-unit-post-app-content
+# ============================= UI Deployer Module ============================
+- name: handling-unit-post_ui_deployer
 # =============================================================================
   type: com.sap.application.content
   path: .
   requires:
-    - name: handling-unit-post-auth
-    - name: handling-unit-post-dest
     - name: handling-unit-post-repo-host
       parameters:
         content-target: true
   build-parameters:
     build-result: resources
     requires:
-    - artifacts:
-      - comndbshandlingunitpostui.zip
-      name: comndbshandlingunitpostui
-      target-path: resources/
+      - artifacts:
+          - comndbshandlingunitpostui.zip
+        name: comndbshandlingunitpostui
+        target-path: resources/
 
 # ============================ HTML5 Module ===================================       
 - name: comndbshandlingunitpostui
@@ -76,8 +72,8 @@ modules:
     build-result: dist
     builder: custom
     commands:
-    - npm install
-    - npm run build:cf
+      - npm install
+      - npm run build:cf
     supported-platforms: []
 
 resources:
@@ -86,12 +82,12 @@ resources:
 # =============================================================================
   type: org.cloudfoundry.managed-service
   parameters:
+    path: ./xs-security.json
     service: xsuaa
     service-plan: application
-    path: ./xs-security.json
 
 # ===============================  Destination Service ========================
-- name: handling-unit-post-dest
+- name: handling-unit-post-destination-service
 # =============================================================================
   type: org.cloudfoundry.managed-service
   parameters:
@@ -102,20 +98,25 @@ resources:
       init_data:
         instance:
           destinations:
-          - Authentication: NoAuthentication
-            Description: CAP Backend OData Service Destination
-            HTML5.DynamicDestination: true
-            Name: backend-api
-            ProxyType: Internet
-            Type: HTTP
-            URL: ~{srv-api/srv-url}
-            HTML5.Timeout: 300000   
-          - Authentication: NoAuthentication
-            Name: ui5
-            ProxyType: Internet
-            Type: HTTP
-            URL: https://ui5.sap.com
+            - Authentication: NoAuthentication
+              Description: CAP Backend OData Service Destination
+              HTML5.DynamicDestination: true
+              Name: srv-api
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{srv-api/srv-url}
+              HTML5.Timeout: 300000   
+            - Authentication: NoAuthentication
+              Name: ui5
+              Description: UI5 Library Destination
+              ProxyType: Internet
+              Type: HTTP
+              URL: 'https://ui5.sap.com'
           existing_destinations_policy: update
+      version: 1.0.0
+      service: destination
+      service-name: handling-unit-post-destination-service
+      service-plan: lite
   requires:
     - name: srv-api
         
@@ -125,7 +126,6 @@ resources:
   type: org.cloudfoundry.managed-service
   parameters:
     service: html5-apps-repo
-    service-name: handling-unit-post-html5-srv
     service-plan: app-host
 
 # ========================== HTML5 Repo Runtime ===============================
@@ -144,6 +144,6 @@ build-parameters:
   before-all:
   - builder: custom
     commands:
-    - npm ci
-    - npx cds build --production
-    - npm run build-ts
+      - npm ci
+      - npx cds build --production
+      - npm run build-ts

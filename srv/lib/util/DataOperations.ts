@@ -78,7 +78,6 @@ export default class DataOperations {
                 const hasChild = childNodes.length > 0;
                 node.DrillState = hasChild ? "expanded" : "collapse";
                 node.SubHUNumber = hasChild ? "" : node.SubHUNumber;
-                node.CreationDate = hasChild ? null : node.CreationDate;
 
                 if (hasChild) {
                     const allSameMaterial = childNodes.every(child => child.MaterialNumber === childNodes[0].MaterialNumber);

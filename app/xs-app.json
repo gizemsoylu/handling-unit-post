@@ -4,7 +4,7 @@
   "routes": [
     {
       "source": "^/odata/v2/handling-unit-post/(.*)$",
-      "destination": "srv-api",
+      "destination": "backend-api",
       "authenticationType": "xsuaa"
     }
   ]

@@ -34,7 +34,7 @@ modules:
     - name: srv-api
       group: destinations
       properties:
-        name: srv-api 
+        name: backend-api 
         url: ~{srv-url}
         forwardAuthToken: true
   parameters:
@@ -101,7 +101,7 @@ resources:
             - Authentication: NoAuthentication
               Description: CAP Backend OData Service Destination
               HTML5.DynamicDestination: true
-              Name: srv-api
+              Name: backend-api
               ProxyType: Internet
               Type: HTTP
               URL: ~{srv-api/srv-url}

@@ -54,11 +54,11 @@ export interface IStorageBins {
 }
 
 export interface IMoveStorageBins {
-    WarehouseProcessType : string;
-    SourceHandlingUnit : string;
-    EWMWarehouse : string;
-    DestinationStorageType : string;
-    DestinationStorageBin : string;
+    WarehouseProcessType: string;
+    SourceHandlingUnit: string;
+    EWMWarehouse: string;
+    DestinationStorageType: string;
+    DestinationStorageBin: string;
 }
 
 export interface IWhereClause {

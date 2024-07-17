@@ -34,7 +34,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         const filters = req.query.SELECT.where as unknown as IWhereClause[];
         nodeList = filterOperations.filterNodeList(nodeList, filters);
     }
-    
+
     nodeList.$count = nodeList.length;
     return nodeList;
 };
@@ -75,15 +75,21 @@ const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<
 }
 
 const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMoveStorageBins>): Promise<void> {
-    const DestinationStorageBin = req.data.DestinationStorageBin;
-    const DestinationStorageType = req.data.DestinationStorageType;
-    const SourceHandlingUnit = req.data.SourceHandlingUnit;
-    const WarehouseProcessType = req.data.WarehouseProcessType;
-    const EWMWarehouse = req.data.EWMWarehouse;
+    try {
+        const { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse } = req.data;
+        const body = { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse };
+        const warehouseOrderSrv = await connect.to("WAREHOUSEORDER");
+        const response = await warehouseOrderSrv.send("POST", "/WarehouseTask", body);
+        return response
 
-
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`${error.message}`);
+        } else {
+            throw new Error("Failed to move handling units due to an unexpected error. Please try again later.");
+        }
+    }
 }
-
 
 
 export {

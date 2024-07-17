@@ -1,0 +1,1740 @@
+{
+ "meta": {
+  "creator": "cds-dk 7.9.2"
+ },
+ "$version": "2.0",
+ "definitions": {
+  "WAREHOUSEORDER.SAP__Message": {
+   "kind": "type",
+   "@cds.external": true,
+   "elements": {
+    "code": {
+     "type": "cds.LargeString",
+     "notNull": true
+    },
+    "message": {
+     "type": "cds.LargeString",
+     "notNull": true
+    },
+    "target": {
+     "type": "cds.LargeString"
+    },
+    "additionalTargets": {
+     "items": {
+      "type": "cds.LargeString",
+      "notNull": true
+     }
+    },
+    "transition": {
+     "type": "cds.Boolean",
+     "notNull": true
+    },
+    "numericSeverity": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true
+    },
+    "longtextUrl": {
+     "type": "cds.LargeString"
+    }
+   }
+  },
+  "WAREHOUSEORDER": {
+   "kind": "service",
+   "@cds.external": true,
+   "@CodeList.UnitsOfMeasure": {
+    "Url": "../../../../default/iwbep/common/0001/$metadata",
+    "CollectionPath": "UnitsOfMeasure"
+   },
+   "@Aggregation.ApplySupported": {
+    "Transformations": [
+     "aggregate",
+     "groupby",
+     "filter"
+    ],
+    "Rollup": {
+     "#": "None"
+    }
+   },
+   "@Common.ApplyMultiUnitBehaviorForSortingAndFiltering": true,
+   "@Capabilities.FilterFunctions": [
+    "eq",
+    "ne",
+    "gt",
+    "ge",
+    "lt",
+    "le",
+    "and",
+    "or",
+    "contains",
+    "startswith",
+    "endswith",
+    "any",
+    "all"
+   ],
+   "@Capabilities.SupportedFormats": [
+    "application/json",
+    "application/pdf"
+   ],
+   "@PDF.Features": {
+    "DocumentDescriptionReference": "../../../../default/iwbep/common/0001/$metadata",
+    "DocumentDescriptionCollection": "MyDocumentDescriptions",
+    "ArchiveFormat": true,
+    "Border": true,
+    "CoverPage": true,
+    "FitToPage": true,
+    "FontName": true,
+    "FontSize": true,
+    "Margin": true,
+    "Padding": true,
+    "Signature": true,
+    "HeaderFooter": true,
+    "ResultSizeDefault": 20000,
+    "ResultSizeMaximum": 20000,
+    "IANATimezoneFormat": true,
+    "Treeview": true
+   },
+   "@Capabilities.KeyAsSegmentSupported": true,
+   "@Capabilities.AsynchronousRequestsSupported": true,
+   "@Authorization.SecuritySchemes": [
+    {
+     "Authorization": "OAuth2Auth",
+     "RequiredScopes": [
+      "OV4:API_WAREHOUSE_ORDER_TASK_2"
+     ]
+    },
+    {
+     "Authorization": "BasicAuth"
+    }
+   ],
+   "@Authorization.Authorizations": [
+    {
+     "$Type": "Auth.OAuth2AuthCode",
+     "Name": "OAuth2Auth",
+     "RefreshUrl": "https://{host}:{port}",
+     "AuthorizationUrl": "https://{host}:{port}",
+     "TokenUrl": "https://{host}:{port}",
+     "Scopes": [
+      {
+       "Scope": "OV4:API_WAREHOUSE_ORDER_TASK_2"
+      }
+     ]
+    },
+    {
+     "$Type": "Auth.Http",
+     "Name": "BasicAuth",
+     "Scheme": "basic"
+    }
+   ]
+  },
+  "WAREHOUSEORDER.WarehouseOrder": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "EWMWarehouse": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "Warehouse",
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Warehouse Number",
+     "@Common.Heading": "WhN",
+     "@Common.QuickInfo": "Warehouse Number/Warehouse Complex"
+    },
+    "WarehouseOrder": {
+     "key": true,
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Warehouse Order",
+     "@Common.Heading": "Whse Order",
+     "@Common.QuickInfo": "Warehouse Order Number"
+    },
+    "WarehouseOrderStatus": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Whse Order Status",
+     "@Common.QuickInfo": "Warehouse Order Status"
+    },
+    "WhseOrderCreationDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Core.Computed": true,
+     "@Common.Label": "Creation Time"
+    },
+    "WarehouseOrderStartDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Core.Computed": true,
+     "@Common.Label": "Start Time"
+    },
+    "WhseOrderConfirmedDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Core.Computed": true,
+     "@Common.Label": "Confirmation Time",
+     "@Common.QuickInfo": "Time of Confirmation"
+    },
+    "WhseOrderLastChgUTCDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Core.Computed": true,
+     "@Common.Label": "Short Time Stamp",
+     "@Common.Heading": "Short Form of Time Stamp",
+     "@Common.QuickInfo": "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"
+    },
+    "WhseOrderLatestStartDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Core.Computed": true,
+     "@Common.Label": "Latest Starting Date",
+     "@Common.Heading": "LSD",
+     "@Common.QuickInfo": "Latest Starting Date (LSD)"
+    },
+    "WarehouseOrderCreationRule": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "WO Creation Rule",
+     "@Common.Heading": "Warehouse Order Creation Rule",
+     "@Common.QuickInfo": "Warehouse Order Creation Rule"
+    },
+    "WhseOrderCreationRuleCategory": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "WO Creation Rule Cat",
+     "@Common.QuickInfo": "Category of Warehouse Order Creation Rule"
+    },
+    "ActivityArea": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Activity Area"
+    },
+    "Queue": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Queue",
+     "@Common.Heading": "Q"
+    },
+    "Processor": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Processor"
+    },
+    "ExecutingResource": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseResource",
+     "@Core.Computed": true,
+     "@Common.Label": "Resource",
+     "@Common.QuickInfo": "Resource (Means of Transportation or User)"
+    },
+    "WhseProcessTypeDocumentHdr": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Hdr WhsePT",
+     "@Common.QuickInfo": "Document Header Warehouse Process Type"
+    },
+    "CreatedByUser": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Created By"
+    },
+    "LastChangedByUser": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Changed By"
+    },
+    "ConfirmedByUser": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Confirmed By"
+    },
+    "WhseOrderForSplitWhseOrder": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Split WO",
+     "@Common.QuickInfo": "Warehouse Order Number of WO That Was Split"
+    },
+    "WarehouseOrderIsSplit": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.Label": "Split",
+     "@Common.QuickInfo": "Warehouse Order Was Split"
+    },
+    "WarehouseOrderPlannedDuration": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Measures.Unit": {
+      "=": "WhseOrderPlanDurationTimeUnit"
+     },
+     "@Common.Label": "Plnd Execution Time",
+     "@Common.QuickInfo": "Planned Execution Time of Warehouse Order"
+    },
+    "WhseOrderPlanDurationTimeUnit": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUnit": true,
+     "@Core.Computed": true,
+     "@Common.Label": "Time Unit",
+     "@Common.Heading": "Time",
+     "@Common.QuickInfo": "Warehouse Order: Time Unit"
+    },
+    "SAP__Messages": {
+     "items": {
+      "type": "WAREHOUSEORDER.SAP__Message",
+      "notNull": true
+     }
+    },
+    "_WarehouseOrderPickHndlgUnit": {
+     "type": "cds.Composition",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseOrderPickHndlgUnit",
+     "cardinality": {
+      "max": "*"
+     },
+     "@Common.Composition": true
+    },
+    "_WarehouseTask": {
+     "type": "cds.Composition",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseTask",
+     "cardinality": {
+      "max": "*"
+     },
+     "@Common.Composition": true
+    }
+   },
+   "actions": {
+    "AssignWarehouseOrder": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      },
+      "EWMResource": {
+       "type": "cds.String",
+       "length": 18,
+       "notNull": true,
+       "@Common.Label": "Resource",
+       "@Common.QuickInfo": "Resource (Means of Transportation or User)"
+      }
+     }
+    },
+    "SetWarehouseOrderToInProcess": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      }
+     }
+    },
+    "UnassignWarehouseOrder": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      }
+     }
+    }
+   },
+   "@Common.Label": "Warehouse Order",
+   "@Common.Messages": {
+    "=": "SAP__Messages"
+   },
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.InsertRestrictions.Insertable": false,
+   "@Capabilities.DeleteRestrictions.Deletable": false,
+   "@Capabilities.UpdateRestrictions.NonUpdatableNavigationProperties": [
+    "_WarehouseOrderPickHndlgUnit",
+    "_WarehouseTask"
+   ],
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true,
+   "@Core.OptimisticConcurrency": [
+    "WhseOrderLastChgUTCDateTime"
+   ],
+   "@Capabilities.FilterRestrictions.FilterExpressionRestrictions": [
+    {
+     "Property": {
+      "=": "WarehouseOrderPlannedDuration"
+     },
+     "AllowedExpressions": "MultiValue"
+    }
+   ]
+  },
+  "WAREHOUSEORDER.WarehouseOrderPickHndlgUnit": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "EWMWarehouse": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Warehouse Number",
+     "@Common.Heading": "WhN",
+     "@Common.QuickInfo": "Warehouse Number/Warehouse Complex"
+    },
+    "WarehouseOrder": {
+     "key": true,
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Warehouse Order",
+     "@Common.Heading": "Whse Order",
+     "@Common.QuickInfo": "Warehouse Order Number"
+    },
+    "HandlingUnitExternalID": {
+     "key": true,
+     "type": "cds.String",
+     "length": 20,
+     "notNull": true,
+     "@Core.Immutable": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Handling Unit"
+    },
+    "PackagingMaterial": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Product",
+     "@Common.QuickInfo": "Product Number"
+    },
+    "EWMWhseOrderNmbrOfHndlgUnits": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "HU Identification",
+     "@Common.Heading": "HU Ident.",
+     "@Common.QuickInfo": "Identification of a Handling Unit in a Warehouse Order"
+    },
+    "SAP__Messages": {
+     "items": {
+      "type": "WAREHOUSEORDER.SAP__Message",
+      "notNull": true
+     }
+    },
+    "_WarehouseOrder": {
+     "type": "cds.Association",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseOrder",
+     "cardinality": {
+      "max": 1
+     },
+     "on": [
+      {
+       "ref": [
+        "_WarehouseOrder",
+        "WarehouseOrder"
+       ]
+      },
+      "=",
+      {
+       "ref": [
+        "WarehouseOrder"
+       ]
+      }
+     ]
+    }
+   },
+   "@Common.Label": "Warehouse Order Pick Handling Unit",
+   "@Common.Messages": {
+    "=": "SAP__Messages"
+   },
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.InsertRestrictions.RequiredProperties": [
+    "HandlingUnitExternalID"
+   ],
+   "@Capabilities.UpdateRestrictions.Updatable": false,
+   "@Capabilities.UpdateRestrictions.NonUpdatableNavigationProperties": [
+    "_WarehouseOrder"
+   ],
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true,
+   "@Core.OptimisticConcurrency": [
+    "_WarehouseOrder/WhseOrderLastChgUTCDateTime"
+   ]
+  },
+  "WAREHOUSEORDER.WarehouseTask": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "EWMWarehouse": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "Warehouse",
+     "@Core.Immutable": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Warehouse Number",
+     "@Common.Heading": "WhN",
+     "@Common.QuickInfo": "Warehouse Number/Warehouse Complex"
+    },
+    "WarehouseTask": {
+     "key": true,
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Warehouse Task",
+     "@Common.Heading": "Whse Task"
+    },
+    "WarehouseTaskItem": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "WT Item",
+     "@Common.Heading": "Item",
+     "@Common.QuickInfo": "Warehouse Task Item"
+    },
+    "WarehouseOrder": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseOrder",
+     "@Core.Immutable": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Warehouse Order",
+     "@Common.Heading": "Whse Order",
+     "@Common.QuickInfo": "Warehouse Order Number"
+    },
+    "WhseTaskCrtnUTCDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Creation Time"
+    },
+    "WhseTaskLastChgUTCDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Short Time Stamp",
+     "@Common.Heading": "Short Form of Time Stamp",
+     "@Common.QuickInfo": "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"
+    },
+    "WhseTaskConfUTCDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Time Stamp",
+     "@Common.QuickInfo": "UTC Time Stamp in Short Form (YYYYMMDDhhmmss)"
+    },
+    "ConfirmedByUser": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true
+    },
+    "WhseTaskPlannedClosingDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "Planned Closing Time",
+     "@Common.QuickInfo": "Planned Closing Date/Time"
+    },
+    "WhseTaskGoodsReceiptDateTime": {
+     "type": "cds.DateTime",
+     "@odata.Precision": 0,
+     "@odata.Type": "Edm.DateTimeOffset",
+     "@Common.Label": "GR Date",
+     "@Common.QuickInfo": "Date and Time of Goods Receipt"
+    },
+    "WarehouseTaskStatus": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "WT Status",
+     "@Common.QuickInfo": "Warehouse Task Status"
+    },
+    "WarehouseProcessType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Whse Process Type",
+     "@Common.Heading": "Proc. Type",
+     "@Common.QuickInfo": "Warehouse Process Type"
+    },
+    "WarehouseProcessCategory": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Whse Proc. Category",
+     "@Common.Heading": "C",
+     "@Common.QuickInfo": "Warehouse Process Category"
+    },
+    "IsHandlingUnitWarehouseTask": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Common.Label": "HU Warehouse Task",
+     "@Common.Heading": "HU WT",
+     "@Common.QuickInfo": "Handling Unit Warehouse Task"
+    },
+    "EWMHandlingUnitType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Handling Unit Type"
+    },
+    "HandlingUnitTypeGroup": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.Label": "HU Type Group",
+     "@Common.Heading": "HU Gr",
+     "@Common.QuickInfo": "Handling Unit Type Group"
+    },
+    "HomogeneousFullPalletPick": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.Label": "Removal of Whole HU",
+     "@Common.Heading": "Whole HU",
+     "@Common.QuickInfo": "Stock Removal of Whole, Homogenous Handling Unit"
+    },
+    "EWMPutAwayPhysInvtryPlnSts": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Ptwy PI Plan.",
+     "@Common.Heading": "PI Planned",
+     "@Common.QuickInfo": "Putaway Physical Inventory Planned"
+    },
+    "EWMWhseTskLowStkChkPlnSts": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "L.StkChk Plan.",
+     "@Common.Heading": "L.StkPln",
+     "@Common.QuickInfo": "Low Stock Check Planned"
+    },
+    "EWMPutAwayPhysInvtryExecSts": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Ptwy PI Done",
+     "@Common.Heading": "PI Done",
+     "@Common.QuickInfo": "Inventory on Putaway Performed"
+    },
+    "EWMWhseTskLowStkChkExecSts": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "L.StkChk Done",
+     "@Common.Heading": "L.StkChk",
+     "@Common.QuickInfo": "Low Stock Check Performed"
+    },
+    "Product": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Product",
+     "@Common.QuickInfo": "Product Number"
+    },
+    "Batch": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Batch"
+    },
+    "BatchChangeIsNotAllowed": {
+     "type": "cds.Boolean",
+     "notNull": true,
+     "@Common.Label": "Change Batch",
+     "@Common.QuickInfo": "Changing the Batch is not Allowed"
+    },
+    "CountryOfOrigin": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Ctry/Reg. of Origin",
+     "@Common.Heading": "Origin",
+     "@Common.QuickInfo": "Country/Region of Origin"
+    },
+    "ShelfLifeExpirationDate": {
+     "type": "cds.Date",
+     "@Common.Label": "Expiration Date",
+     "@Common.Heading": "Expiration",
+     "@Common.QuickInfo": "Shelf Life Expiration Date"
+    },
+    "EWMStockType": {
+     "type": "cds.String",
+     "length": 2,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Stock Type",
+     "@Common.Heading": "Typ"
+    },
+    "EWMStockUsage": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Usage",
+     "@Common.Heading": "Use",
+     "@Common.QuickInfo": "Stock Usage"
+    },
+    "EWMStockOwner": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Character Field with Length 10"
+    },
+    "EntitledToDisposeParty": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Disposal Party",
+     "@Common.Heading": "Disposal",
+     "@Common.QuickInfo": "Party Entitled to Dispose"
+    },
+    "WBSElementInternalID": {
+     "type": "cds.String",
+     "length": 8,
+     "notNull": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "WBS Internal ID",
+     "@Common.Heading": "WBS Elem",
+     "@Common.QuickInfo": "WBS Element"
+    },
+    "WBSElementExternalID": {
+     "type": "cds.String",
+     "length": 24,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "WBS Element",
+     "@Common.QuickInfo": "Work Breakdown Structure Element (WBS Element) Edited"
+    },
+    "SpecialStockIdfgSalesOrder": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true
+    },
+    "SpecialStockIdfgSalesOrderItem": {
+     "type": "cds.String",
+     "length": 6,
+     "notNull": true,
+     "@Common.IsDigitSequence": true
+    },
+    "ExecutingResource": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseResource",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Resource",
+     "@Common.Heading": "Executing Resource",
+     "@Common.QuickInfo": "Executing Resource (Means of Transport or User)"
+    },
+    "WarehouseMovementsReason": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Movement Reason",
+     "@Common.Heading": "Reasn",
+     "@Common.QuickInfo": "Reason for Movements in the Warehouse"
+    },
+    "ProductionOrder": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Manufacturing Order"
+    },
+    "EWMProductionSupplyArea": {
+     "type": "cds.String",
+     "length": 15,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Supply Area",
+     "@Common.Heading": "Production Supply Area",
+     "@Common.QuickInfo": "Production Supply Area"
+    },
+    "EWMDocumentCategory": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Document Category",
+     "@Common.Heading": "Cat",
+     "@Common.QuickInfo": "Doc. Category for Doc. Reference and Doc.-Related Stock"
+    },
+    "EWMReferenceDocumentCategory": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Document Category",
+     "@Common.Heading": "Cat",
+     "@Common.QuickInfo": "Doc. Category for Doc. Reference and Doc.-Related Stock"
+    },
+    "EWMDelivery": {
+     "type": "cds.String",
+     "length": 35,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Document Number"
+    },
+    "EWMDeliveryItem": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Item Number"
+    },
+    "PurchasingDocument": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Purchasing Document",
+     "@Common.Heading": "Pur. Doc.",
+     "@Common.QuickInfo": "Purchasing Document Number"
+    },
+    "PurchasingDocumentItem": {
+     "type": "cds.String",
+     "length": 5,
+     "notNull": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Item",
+     "@Common.QuickInfo": "Item Number of Purchasing Document"
+    },
+    "SalesDocument": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "SD Document",
+     "@Common.Heading": "Document",
+     "@Common.QuickInfo": "Sales and Distribution Document Number"
+    },
+    "SalesDocumentItem": {
+     "type": "cds.String",
+     "length": 6,
+     "notNull": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Sales Document Item",
+     "@Common.Heading": "Item"
+    },
+    "BaseUnit": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUnit": true,
+     "@Common.Label": "Base Unit of Measure",
+     "@Common.Heading": "BUn"
+    },
+    "EWMBaseUnitISOCode": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "ISO Code",
+     "@Common.Heading": "ISO",
+     "@Common.QuickInfo": "ISO Code for Unit of Measurement"
+    },
+    "AlternativeUnit": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUnit": true,
+     "@Common.Label": "Alt. Unit of Measure",
+     "@Common.Heading": "AUn",
+     "@Common.QuickInfo": "Alternative Unit of Measure for Stockkeeping Unit"
+    },
+    "EWMAlternativeUnitISOCode": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "ISO Code",
+     "@Common.Heading": "ISO",
+     "@Common.QuickInfo": "ISO Code for Unit of Measurement"
+    },
+    "TargetQuantityInBaseUnit": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "BaseUnit"
+     },
+     "@Common.Label": "Target Quantity Base",
+     "@Common.Heading": "Target Qty Bs",
+     "@Common.QuickInfo": "Target Quantity in Base Unit of Measure"
+    },
+    "TargetQuantityInAltvUnit": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "AlternativeUnit"
+     },
+     "@Common.Label": "Target Quantity Altn",
+     "@Common.Heading": "Target Qty Al",
+     "@Common.QuickInfo": "Target Quantity in Alternative Unit of Measure"
+    },
+    "ActualQuantityInBaseUnit": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "BaseUnit"
+     }
+    },
+    "ActualQuantityInAltvUnit": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "AlternativeUnit"
+     }
+    },
+    "DifferenceQuantityInBaseUnit": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "BaseUnit"
+     }
+    },
+    "DifferenceQuantityInAltvUnit": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "AlternativeUnit"
+     }
+    },
+    "WhseTaskNetWeightUnitOfMeasure": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUnit": true,
+     "@Common.Label": "Weight Unit",
+     "@Common.Heading": "Un"
+    },
+    "WhseTaskNetWeight": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "WhseTaskNetWeightUnitOfMeasure"
+     },
+     "@Common.Label": "Loading Weight",
+     "@Common.QuickInfo": "Loading or Net Weight"
+    },
+    "WhseTaskNetVolumeUnitOfMeasure": {
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Common.IsUnit": true,
+     "@Common.Label": "Volume Unit",
+     "@Common.Heading": "VUn"
+    },
+    "WhseTaskNetVolume": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "notNull": true,
+     "@Measures.Unit": {
+      "=": "WhseTaskNetVolumeUnitOfMeasure"
+     },
+     "@Common.Label": "Loading Volume",
+     "@Common.QuickInfo": "Loading or Net Volume"
+    },
+    "SourceStorageType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseStorageType",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Source Storage Type",
+     "@Common.Heading": "Type"
+    },
+    "SourceStorageSection": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Source Stor. Section",
+     "@Common.Heading": "Sec.",
+     "@Common.QuickInfo": "Source Storage Section"
+    },
+    "SourceStorageBin": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseStorageBin",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Source Storage Bin",
+     "@Common.Heading": "Source Bin"
+    },
+    "SourceResource": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseResource",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Source Resource",
+     "@Common.QuickInfo": "Source Resource (Means of Transport or User)"
+    },
+    "DestinationStorageType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseStorageType",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Dest. Storage Type",
+     "@Common.Heading": "Type",
+     "@Common.QuickInfo": "Destination Storage Type"
+    },
+    "DestinationStorageSection": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Dest. Stor. Section",
+     "@Common.Heading": "Sec.",
+     "@Common.QuickInfo": "Destination Storage Section"
+    },
+    "DestinationStorageBin": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseStorageBin",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Destination Bin",
+     "@Common.Heading": "Dest. Bin",
+     "@Common.QuickInfo": "Destination Storage Bin"
+    },
+    "DestinationResource": {
+     "type": "cds.String",
+     "length": 18,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "WarehouseResource",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Dest.Resource",
+     "@Common.QuickInfo": "Destination Resource (Means of Transport or User)"
+    },
+    "WhseTaskTwoStepPickingType": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Warehouse Task Type",
+     "@Common.Heading": "WTType",
+     "@Common.QuickInfo": "Warehouse Task Type Within Two-Step Picking"
+    },
+    "WhseTaskTwoStepPickingRlvnce": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Two-Step Picking",
+     "@Common.Heading": "2StP",
+     "@Common.QuickInfo": "Relevance for Two-Step Picking"
+    },
+    "ActivityArea": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Activity Area"
+    },
+    "SourceHandlingUnit": {
+     "type": "cds.String",
+     "length": 20,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "HandlingUnit",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Source Handling Unit"
+    },
+    "DestinationHandlingUnit": {
+     "type": "cds.String",
+     "length": 20,
+     "notNull": true,
+     "@Common.SAPObjectNodeTypeReference": "HandlingUnit",
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Dest. HU",
+     "@Common.Heading": "Dest. Handling Unit",
+     "@Common.QuickInfo": "Destination Handling Unit"
+    },
+    "WarehouseTaskExceptionCode": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true
+    },
+    "WhseTaskSortingSequenceValue": {
+     "type": "cds.Decimal",
+     "precision": 10,
+     "notNull": true,
+     "@Common.Label": "Sort Sequence",
+     "@Common.Heading": "Sort Seq."
+    },
+    "WarehouseOrderSequenceValue": {
+     "type": "cds.Double",
+     "notNull": true,
+     "@Common.Label": "Sequence",
+     "@Common.QuickInfo": "Internal Sequence of Warehouse Order"
+    },
+    "WarehouseOrderActivityArea": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "WO Activity Area",
+     "@Common.Heading": "Activity Area",
+     "@Common.QuickInfo": "Warehouse Order Activity Area"
+    },
+    "WarehouseOrderCreationRule": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "WO Creation Rule",
+     "@Common.Heading": "Warehouse Order Creation Rule",
+     "@Common.QuickInfo": "Warehouse Order Creation Rule"
+    },
+    "WarehouseOrderQueue": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Queue",
+     "@Common.Heading": "Q"
+    },
+    "WarehouseActivityType": {
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Activity"
+    },
+    "EWMConsolidationGroup": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.Label": "Consolidation Group",
+     "@Common.Heading": "CnsGrp"
+    },
+    "EWMWarehouseTaskPriority": {
+     "type": "cds.Integer",
+     "@odata.Type": "Edm.Byte",
+     "notNull": true,
+     "@Common.Label": "Priority"
+    },
+    "CreatedByUser": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Created By"
+    },
+    "EWMRoute": {
+     "type": "cds.String",
+     "length": 10,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Route",
+     "@Common.QuickInfo": "Route Name (Identification)"
+    },
+    "EWMCanceledWarehouseTask": {
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Common.IsDigitSequence": true
+    },
+    "SerialNumberRequiredLevel": {
+     "type": "cds.String",
+     "length": 1,
+     "notNull": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Serial No. Requiremt",
+     "@Common.QuickInfo": "Serial Number Requirement"
+    },
+    "SAP__Messages": {
+     "items": {
+      "type": "WAREHOUSEORDER.SAP__Message",
+      "notNull": true
+     }
+    },
+    "_WarehouseOrder": {
+     "type": "cds.Association",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseOrder",
+     "cardinality": {
+      "max": 1
+     },
+     "on": [
+      {
+       "ref": [
+        "_WarehouseOrder",
+        "WarehouseOrder"
+       ]
+      },
+      "=",
+      {
+       "ref": [
+        "WarehouseOrder"
+       ]
+      }
+     ]
+    },
+    "_WarehouseTaskExceptionCode": {
+     "type": "cds.Composition",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseTaskExceptionCode",
+     "cardinality": {
+      "max": "*"
+     },
+     "@Common.Composition": true
+    },
+    "_WarehouseTaskSerialNumber": {
+     "type": "cds.Composition",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseTaskSerialNumber",
+     "cardinality": {
+      "max": "*"
+     },
+     "@Common.Composition": true
+    }
+   },
+   "actions": {
+    "AddSrlNmbrToTaskConf": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      },
+      "EWMSerialNumber": {
+       "type": "cds.String",
+       "length": 30,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       }
+      },
+      "EWMSerialNumberIsForDiffQty": {
+       "type": "cds.Boolean",
+       "notNull": true,
+       "@Common.Label": "Serial No. Diff. Qty",
+       "@Common.QuickInfo": "Serial Number for Difference Quantity"
+      }
+     }
+    },
+    "ConfirmWarehouseTaskProduct": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      },
+      "AlternativeUnit": {
+       "type": "cds.String",
+       "length": 3,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.IsUnit": true,
+       "@Common.Label": "Alt. Unit of Measure",
+       "@Common.Heading": "AUn",
+       "@Common.QuickInfo": "Alternative Unit of Measure for Stockkeeping Unit"
+      },
+      "ActualQuantityInAltvUnit": {
+       "type": "cds.Decimal",
+       "precision": 31,
+       "scale": 14,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Measures.Unit": {
+        "=": "AlternativeUnit"
+       },
+       "@Common.Label": "Actual Quantity",
+       "@Common.Heading": "Actual Qty",
+       "@Common.QuickInfo": "Actual Quantity in Alternative Unit of Measure"
+      },
+      "DifferenceQuantityInAltvUnit": {
+       "type": "cds.Decimal",
+       "precision": 31,
+       "scale": 14,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Measures.Unit": {
+        "=": "AlternativeUnit"
+       },
+       "@Common.Label": "Difference Quantity",
+       "@Common.Heading": "Difference Qty",
+       "@Common.QuickInfo": "Difference quantity in alternate unit of measure"
+      },
+      "WhseTaskExceptionCodeQtyDiff": {
+       "type": "cds.String",
+       "length": 4,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.Label": "Exception Code"
+      },
+      "DestinationStorageBin": {
+       "type": "cds.String",
+       "length": 18,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.Label": "Destination Bin",
+       "@Common.Heading": "Dest. Bin",
+       "@Common.QuickInfo": "Destination Storage Bin"
+      },
+      "WhseTaskExCodeDestStorageBin": {
+       "type": "cds.String",
+       "length": 4,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.Label": "Exception Code"
+      },
+      "SourceHandlingUnit": {
+       "type": "cds.String",
+       "length": 20,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.Label": "Source Handling Unit"
+      },
+      "DestinationHandlingUnit": {
+       "type": "cds.String",
+       "length": 20,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.Label": "Source Handling Unit"
+      },
+      "DestinationResource": {
+       "type": "cds.String",
+       "length": 18,
+       "notNull": true,
+       "@Common.Label": "Dest.Resource",
+       "@Common.QuickInfo": "Destination Resource (Means of Transport or User)"
+      },
+      "EWMPutAwayPhysInvtryExecSts": {
+       "type": "cds.String",
+       "length": 1,
+       "notNull": true,
+       "@Common.Label": "Ptwy PI Done",
+       "@Common.Heading": "PI Done",
+       "@Common.QuickInfo": "Inventory on Putaway Performed"
+      },
+      "EWMWhseTskLowStkChkExecSts": {
+       "type": "cds.String",
+       "length": 1,
+       "notNull": true,
+       "@Common.Label": "L.StkChk Done",
+       "@Common.Heading": "L.StkChk",
+       "@Common.QuickInfo": "Low Stock Check Performed"
+      },
+      "EWMWhseTaskLowStockCheckQty": {
+       "type": "cds.Decimal",
+       "precision": 31,
+       "scale": 14,
+       "notNull": true,
+       "@Measures.Unit": {
+        "=": "AlternativeUnit"
+       },
+       "@Common.Label": "Remaining Quantity",
+       "@Common.Heading": "Remaining Qty",
+       "@Common.QuickInfo": "Remaining Qty in Source Bin in Alternative Unit of Measure"
+      }
+     }
+    },
+    "CancelWarehouseTask": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      }
+     }
+    },
+    "ConfirmWarehouseTaskHndlgUnit": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      },
+      "DestinationStorageBin": {
+       "type": "cds.String",
+       "length": 18,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.Label": "Destination Bin",
+       "@Common.Heading": "Dest. Bin",
+       "@Common.QuickInfo": "Destination Storage Bin"
+      },
+      "WhseTaskExCodeDestStorageBin": {
+       "type": "cds.String",
+       "length": 4,
+       "notNull": true,
+       "@Common.FieldControl": {
+        "#": "Mandatory"
+       },
+       "@Common.Label": "Exception Code"
+      },
+      "DestinationResource": {
+       "type": "cds.String",
+       "length": 18,
+       "notNull": true,
+       "@Common.Label": "Dest.Resource",
+       "@Common.QuickInfo": "Destination Resource (Means of Transport or User)"
+      }
+     }
+    },
+    "ConfirmWarehouseTaskExact": {
+     "kind": "action",
+     "params": {
+      "_it": {
+       "type": "$self",
+       "notNull": true
+      }
+     }
+    }
+   },
+   "@Common.Label": "Warehouse Task",
+   "@Common.Messages": {
+    "=": "SAP__Messages"
+   },
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.DeleteRestrictions.Deletable": false,
+   "@Capabilities.UpdateRestrictions.Updatable": false,
+   "@Capabilities.UpdateRestrictions.NonUpdatableNavigationProperties": [
+    "_WarehouseOrder",
+    "_WarehouseTaskExceptionCode",
+    "_WarehouseTaskSerialNumber"
+   ],
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true,
+   "@Core.OptimisticConcurrency": [
+    "WhseTaskLastChgUTCDateTime"
+   ],
+   "@Capabilities.FilterRestrictions.FilterExpressionRestrictions": [
+    {
+     "Property": {
+      "=": "TargetQuantityInBaseUnit"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "TargetQuantityInAltvUnit"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "ActualQuantityInBaseUnit"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "ActualQuantityInAltvUnit"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "DifferenceQuantityInBaseUnit"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "DifferenceQuantityInAltvUnit"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "WhseTaskNetWeight"
+     },
+     "AllowedExpressions": "MultiValue"
+    },
+    {
+     "Property": {
+      "=": "WhseTaskNetVolume"
+     },
+     "AllowedExpressions": "MultiValue"
+    }
+   ]
+  },
+  "WAREHOUSEORDER.WarehouseTaskExceptionCode": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "EWMWarehouse": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Warehouse Number",
+     "@Common.Heading": "WhN",
+     "@Common.QuickInfo": "Warehouse Number/Warehouse Complex"
+    },
+    "WarehouseTask": {
+     "key": true,
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Warehouse Task",
+     "@Common.Heading": "Whse Task"
+    },
+    "WarehouseTaskItem": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "WT Item",
+     "@Common.Heading": "Item",
+     "@Common.QuickInfo": "Warehouse Task Item"
+    },
+    "WarehouseTaskExceptionCode": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Exception Code"
+    },
+    "BusinessContext": {
+     "key": true,
+     "type": "cds.String",
+     "length": 3,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Business Context"
+    },
+    "BusinessContextExecutionStep": {
+     "key": true,
+     "type": "cds.String",
+     "length": 2,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Exec. Step",
+     "@Common.QuickInfo": "Execution Step in Business Context"
+    },
+    "_WarehouseTask": {
+     "type": "cds.Association",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseTask",
+     "cardinality": {
+      "max": 1
+     },
+     "on": [
+      {
+       "ref": [
+        "_WarehouseTask",
+        "WarehouseTaskItem"
+       ]
+      },
+      "=",
+      {
+       "ref": [
+        "WarehouseTaskItem"
+       ]
+      }
+     ]
+    }
+   },
+   "@Common.Label": "Warehouse Task Exception Code",
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.InsertRestrictions.Insertable": false,
+   "@Capabilities.DeleteRestrictions.Deletable": false,
+   "@Capabilities.UpdateRestrictions.Updatable": false,
+   "@Capabilities.UpdateRestrictions.NonUpdatableNavigationProperties": [
+    "_WarehouseTask"
+   ],
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true
+  },
+  "WAREHOUSEORDER.WarehouseTaskSerialNumber": {
+   "kind": "entity",
+   "@cds.external": true,
+   "@cds.persistence.skip": true,
+   "elements": {
+    "EWMWarehouse": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsUpperCase": true,
+     "@Common.Label": "Warehouse Number",
+     "@Common.Heading": "WhN",
+     "@Common.QuickInfo": "Warehouse Number/Warehouse Complex"
+    },
+    "WarehouseTask": {
+     "key": true,
+     "type": "cds.String",
+     "length": 12,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "Warehouse Task",
+     "@Common.Heading": "Whse Task"
+    },
+    "WarehouseTaskItem": {
+     "key": true,
+     "type": "cds.String",
+     "length": 4,
+     "notNull": true,
+     "@Core.Computed": true,
+     "@Common.IsDigitSequence": true,
+     "@Common.Label": "WT Item",
+     "@Common.Heading": "Item",
+     "@Common.QuickInfo": "Warehouse Task Item"
+    },
+    "EWMSerialNumber": {
+     "key": true,
+     "type": "cds.String",
+     "length": 30,
+     "notNull": true,
+     "@Core.Computed": true
+    },
+    "_WarehouseTask": {
+     "type": "cds.Association",
+     "@cds.ambiguous": "missing on condition?",
+     "target": "WAREHOUSEORDER.WarehouseTask",
+     "cardinality": {
+      "max": 1
+     },
+     "on": [
+      {
+       "ref": [
+        "_WarehouseTask",
+        "WarehouseTaskItem"
+       ]
+      },
+      "=",
+      {
+       "ref": [
+        "WarehouseTaskItem"
+       ]
+      }
+     ]
+    }
+   },
+   "@Common.Label": "Warehouse Task Serial Number",
+   "@Capabilities.SearchRestrictions.Searchable": false,
+   "@Capabilities.InsertRestrictions.Insertable": false,
+   "@Capabilities.DeleteRestrictions.Deletable": false,
+   "@Capabilities.UpdateRestrictions.Updatable": false,
+   "@Capabilities.UpdateRestrictions.NonUpdatableNavigationProperties": [
+    "_WarehouseTask"
+   ],
+   "@Capabilities.UpdateRestrictions.QueryOptions.SelectSupported": true
+  }
+ }
+}

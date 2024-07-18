@@ -12,6 +12,7 @@ export interface IHandlingUnits {
     PackagingMaterialType?: string;
     ProductionOrder?: string;
     QuantityPerHU?: number | null;
+    QuantityAvailability?: string;
     EWMStorageBin?: string;
     EWMStorageType?: string;
     EWMWarehouse?: string;
@@ -26,12 +27,16 @@ export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
 }
 
 export interface IHandlingUnitItems {
+    AvailableEWMStockQty: any;
+    EWMStorageBin: any;
+    EWMStorageType: any;
     HUNumber: string;
     SubHUNumber: string;
     HandlingUnitNumber_1: string;
     HandlingUnitNumber: string;
-    QuantityPerHu: string | null;
+    QuantityAvailability: string;
     QuantityPerHU: number | null;
+    QuantityPerHu: number | null;
     HUType: string;
     HandlingUnitType: string;
     HUStatus: string;

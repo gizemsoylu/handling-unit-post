@@ -14,6 +14,7 @@ annotate service.HandlingUnits with {
     PackagingMaterialType       @Common.Label: '{i18n>PackagingMaterialType}';
     ProductionOrder             @Common.Label: '{i18n>ProductionOrder}';
     QuantityPerHU               @Common.Label: '{i18n>QuantityPerHU}';
+    QuantityAvailability        @Common.Label: '{i18n>QuantityAvailability}';
     EWMStorageBin               @Common.Label: '{i18n>EWMStorageBin}';
     EWMStorageType              @Common.Label: '{i18n>EWMStorageType}';
     EWMWarehouse                @Common.Label: '{i18n>EWMWarehouse}';

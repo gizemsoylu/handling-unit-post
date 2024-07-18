@@ -13,6 +13,7 @@ entity HandlingUnits {
         PackagingMaterialType       : String;
         ProductionOrder             : String;
         QuantityPerHU               : Integer;
+        QuantityAvailability        : String;
         EWMStorageBin               : String;
         EWMStorageType              : String;
         EWMWarehouse                : String;

@@ -3,6 +3,8 @@ using {
     StorageBins   as DBStorageBins
 } from '../db/data-models';
 
+
+@requires: 'authenticated-user'
 service HandlingUnitPost {
     /********************************************************************************************************/
     /* Composite or Table Views                                                                             */
@@ -47,4 +49,12 @@ service HandlingUnitPost {
     @readonly
     entity VHOrders as select distinct key ProductionOrder  from DBHandlingUnits;
 
+    @readonly
+    entity VHStorageBins as select distinct key EWMStorageBin  from DBHandlingUnits;
+
+    @readonly
+    entity VHStorageTypes as select distinct key EWMStorageType  from DBHandlingUnits;
+
+    @readonly
+    entity VHAvailabilityQuantity as select distinct key QuantityAvailability  from DBHandlingUnits;
 }

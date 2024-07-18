@@ -13,8 +13,11 @@ annotate service.HandlingUnits with @(UI: {
         EWMWarehouse,
         HUNumber,
         MaterialNumber,
+        EWMStorageBin,
+        EWMStorageType,
         ProductionOrder,
-        HUStatus
+        HUStatus, 
+        QuantityAvailability
     ],
 
     LineItem       : [
@@ -52,6 +55,22 @@ annotate service.HandlingUnits with @(UI: {
         },
         {
             $Type                : 'UI.DataField',
+            Value                : EWMStorageBin,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '6rem',
+            },
+        },
+        {
+            $Type                : 'UI.DataField',
+            Value                : EWMStorageType,
+            ![@HTML5.CssDefaults]: {
+                $Type: 'HTML5.CssDefaultsType',
+                width: '6rem',
+            },
+        },
+        {
+            $Type                : 'UI.DataField',
             Value                : CreationDate,
             ![@HTML5.CssDefaults]: {
                 $Type: 'HTML5.CssDefaultsType',
@@ -68,14 +87,6 @@ annotate service.HandlingUnits with @(UI: {
         },
         {
             $Type                : 'UI.DataField',
-            Value                : EWMStorageBin,
-            ![@HTML5.CssDefaults]: {
-                $Type: 'HTML5.CssDefaultsType',
-                width: '6rem',
-            },
-        },
-        {
-            $Type                : 'UI.DataField',
             Value                : EWMHUProcessStepIsCompleted,
             ![@HTML5.CssDefaults]: {
                 $Type: 'HTML5.CssDefaultsType',
@@ -85,23 +96,21 @@ annotate service.HandlingUnits with @(UI: {
     ],
 });
 
-annotate service.StorageBins with @(UI: {
-    LineItem       : [
-        {
-            $Type                : 'UI.DataField',
-            Value                : EWMStorageBin,
-            ![@HTML5.CssDefaults]: {
-                $Type: 'HTML5.CssDefaultsType',
-                width: '12rem',
-            },
+annotate service.StorageBins with @(UI: {LineItem: [
+    {
+        $Type                : 'UI.DataField',
+        Value                : EWMStorageBin,
+        ![@HTML5.CssDefaults]: {
+            $Type: 'HTML5.CssDefaultsType',
+            width: '12rem',
         },
-        {
-            $Type                : 'UI.DataField',
-            Value                : EWMStorageType,
-            ![@HTML5.CssDefaults]: {
-                $Type: 'HTML5.CssDefaultsType',
-                width: '12rem',
-            },
+    },
+    {
+        $Type                : 'UI.DataField',
+        Value                : EWMStorageType,
+        ![@HTML5.CssDefaults]: {
+            $Type: 'HTML5.CssDefaultsType',
+            width: '12rem',
         },
-    ],
-});
+    },
+], });

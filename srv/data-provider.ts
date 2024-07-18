@@ -2,7 +2,8 @@ import { ApplicationService } from "@sap/cds";
 import {
     getHandlingUnits, getStorageBins, getEWMWarehouseBins,
     getHandlingUnitStatus, moveHandlingUnits, getHandlingUnitEWMHouses,
-    getHandlingUnitNumbers, getMaterials, getProductionOrders
+    getHandlingUnitNumbers, getMaterials, getProductionOrders,
+    getVHStorageBins, getStorageTypes, getAvailabilityQuantity
 } from "./lib/event-handlers/homepage";
 
 export default class HandlingUnitPost extends ApplicationService {
@@ -17,6 +18,9 @@ export default class HandlingUnitPost extends ApplicationService {
         this.on("READ", "VHStatus", getHandlingUnitStatus);
         this.on("READ", "VHOrders", getProductionOrders);
         this.on("READ", "VHMaterials", getMaterials);
+        this.on("READ", "VHStorageBins", getVHStorageBins);
+        this.on("READ", "VHStorageTypes", getStorageTypes);
+        this.on("READ", "VHAvailabilityQuantity", getAvailabilityQuantity);
 
         this.on("CREATE", "StorageBins", moveHandlingUnits);
         this.on("READ", "HandlingUnits", getHandlingUnits);

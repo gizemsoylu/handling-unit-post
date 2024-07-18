@@ -2,7 +2,7 @@ using HandlingUnitPost as service from '../../../srv/data-provider';
 
 annotate service.HandlingUnits {
     @Common.ValueListWithFixedValues: true
-    HUStatus        @Common.ValueList: {
+    HUStatus             @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHStatus',
         SearchSupported,
@@ -13,7 +13,7 @@ annotate service.HandlingUnits {
         }]
     };
 
-    EWMWarehouse    @Common.ValueList: {
+    EWMWarehouse         @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHWarehouses',
         SearchSupported,
@@ -24,7 +24,7 @@ annotate service.HandlingUnits {
         }]
     };
 
-    HUNumber        @Common.ValueList: {
+    HUNumber             @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHHUNumbers',
         SearchSupported,
@@ -35,7 +35,7 @@ annotate service.HandlingUnits {
         }]
     };
 
-    MaterialNumber  @Common.ValueList: {
+    MaterialNumber       @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHMaterials',
         SearchSupported,
@@ -45,8 +45,28 @@ annotate service.HandlingUnits {
             ValueListProperty: 'MaterialNumber'
         }]
     };
+    EWMStorageBin        @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'VHStorageBins',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: EWMStorageBin,
+            ValueListProperty: 'EWMStorageBin'
+        }]
+    };
+    EWMStorageType       @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'VHStorageTypes',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: EWMStorageType,
+            ValueListProperty: 'EWMStorageType'
+        }]
+    };
 
-    ProductionOrder @Common.ValueList: {
+    ProductionOrder      @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHOrders',
         SearchSupported,
@@ -54,6 +74,19 @@ annotate service.HandlingUnits {
             $Type            : 'Common.ValueListParameterInOut',
             LocalDataProperty: ProductionOrder,
             ValueListProperty: 'ProductionOrder'
+        }]
+    };
+
+    @Common.FilterDefaultValue      : 'Yes'
+    @Common.ValueListWithFixedValues: true
+    QuantityAvailability @Common.ValueList: {
+        $Type         : 'Common.ValueListType',
+        CollectionPath: 'VHAvailabilityQuantity',
+        SearchSupported,
+        Parameters    : [{
+            $Type            : 'Common.ValueListParameterInOut',
+            LocalDataProperty: QuantityAvailability,
+            ValueListProperty: 'QuantityAvailability'
         }]
     };
 }

@@ -28,3 +28,11 @@ entity StorageBins {
     key EWMStorageBin  : String;
         EWMStorageType : String;
 };
+
+type moveHU {
+    EWMWarehouse           : String;
+    SourceHandlingUnit     : String;
+    WarehouseProcessType   : String;
+    DestinationStorageType : String;
+    DestinationStorageBin  : String
+}

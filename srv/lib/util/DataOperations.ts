@@ -22,9 +22,9 @@ export default class DataOperations {
         huItems.HUStatus = this.convertStatus(huItems.HandlingUnitStatus);
         huItems.SubEWMWarehouse = huItems.EWMWarehouse_1;
         huItems.EWMWarehouse = huItems.EWMWarehouse;
-        huItems.CreationDate = huItems.CreationDateTime ? huItems.CreationDateTime : null;
-        huItems.EWMStorageBin = huItems.EWMStorageBin ? huItems.EWMStorageBin : '';
-        huItems.EWMStorageType = huItems.EWMStorageType ? huItems.EWMStorageType : '';
+        huItems.CreationDate = huItems.CreationDateTime || null;
+        huItems.EWMStorageBin = huItems.EWMStorageBin || '';
+        huItems.EWMStorageType = huItems.EWMStorageType || '';
         return huItems;
     }
 
@@ -64,21 +64,19 @@ export default class DataOperations {
         huDetails: IHandlingUnitItems[]
     ): { nodeList: IHandlingUnitsArray, nodeId: number } {
         if (huItems.SubHUNumber) {
-            if (!nodeList.some(node => node.HUNumber === huItems.SubHUNumber && node.ParentNodeID === parentNodeMap[huItems.HUNumber])) {
-                parentNodeMap[huItems.SubHUNumber] = nodeId;
-                nodeList.push({
-                    ...huItems,
-                    QuantityAvailability: huItems.QuantityPerHU === 0 ? 'No' : 'Yes',
-                    HUNumber: huItems.SubHUNumber.replace(/^0+/, ''),
-                    SubHUNumber: "",
-                    NodeID: nodeId,
-                    HierarchyLevel: 1,
-                    ParentNodeID: parentNodeMap[huItems.HUNumber],
-                    DrillState: "collapse",
-                    QuantityPerHU: huItems.QuantityPerHU
-                });
-                nodeId++;
-            }
+            parentNodeMap[huItems.SubHUNumber] = nodeId;
+            nodeList.push({
+                ...huItems,
+                QuantityAvailability: huItems.QuantityPerHU === 0 ? 'No' : 'Yes',
+                HUNumber: huItems.SubHUNumber.replace(/^0+/, ''),
+                SubHUNumber: "",
+                NodeID: nodeId,
+                HierarchyLevel: 1,
+                ParentNodeID: parentNodeMap[huItems.HUNumber],
+                DrillState: "collapse",
+                QuantityPerHU: huItems.QuantityPerHU
+            });
+            nodeId++;
         }
         return { nodeList, nodeId };
     }
@@ -90,7 +88,7 @@ export default class DataOperations {
                 const hasChild = childNodes.length > 0;
                 node.DrillState = hasChild ? "expanded" : "collapse";
                 node.SubHUNumber = hasChild ? "" : node.SubHUNumber;
-
+    
                 if (hasChild) {
                     const allSameMaterial = childNodes.every(child => child.MaterialNumber === childNodes[0].MaterialNumber);
                     const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);

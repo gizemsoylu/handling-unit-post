@@ -5,9 +5,8 @@ import { Button$ClickEvent } from "sap/ui/webc/main/Button";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import MessageBox from "sap/m/MessageBox";
-import { IStorageBins, IMoveHUtoBin, IFailedResponse, Routes } from "../types/global.types";
+import { IStorageBins, IMoveHUtoBin, Routes, IMoveHUBody } from "../types/global.types";
 import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
-import MessageToast from "sap/m/MessageToast";
 import { ISubmitResponse } from "ui5/antares/types/entry/submit";
 import { FormTypes } from "ui5/antares/types/entry/enums";
 import TreeTable from "sap/ui/table/TreeTable";
@@ -61,9 +60,6 @@ export default class Homepage extends BaseController {
 
             this.EWMWarehouse = (((this.byId("uiTreeHandlingUnit") as TreeTable)
                 .getContextByIndex(selectesIndex[0]) as Context).getObject() as { EWMWarehouse: string }).EWMWarehouse
-            this.HUNumber = (((this.byId("uiTreeHandlingUnit") as TreeTable)
-                .getContextByIndex(selectesIndex[0]) as Context).getObject() as { HUNumber: string }).HUNumber
-
             this.entry = new EntryCreateCL<IStorageBins[]>(this, "StorageBins");
             this.entry.setBeginButtonText(this.getResourceBundleText("moveHU"));
             this.entry.setEndButtonText(this.getResourceBundleText("cancel"));
@@ -135,7 +131,8 @@ export default class Homepage extends BaseController {
         const parentNodeID = (rowContext.getObject() as { ParentNodeID: string }).ParentNodeID
 
         if (parentNodeID) {
-            table.removeSelectionInterval(rowIndex, rowIndex);        }
+            table.removeSelectionInterval(rowIndex, rowIndex);
+        }
     }
 
     private onMoveHUSubmitFailed(response: ResponseCL<ISubmitResponse>) {
@@ -144,40 +141,56 @@ export default class Homepage extends BaseController {
 
     private async onMoveHUManualSubmit(entry: EntryCreateCL) {
         BusyIndicator.show(0);
-        const odata = new ODataCreateCL<IMoveHUtoBin>(this, "moveHUtoBin");
         const path = (entry.getEntryContext() as Context).getPath();
         this.EWMStorageBin = (this.getODataModel() as ODataModel).getProperty(path).EWMStorageBin;
-        
+
         if (!this.EWMStorageBin) {
             BusyIndicator.hide();
             MessageBox.error(this.getResourceBundleText("noSelectedStorageBins"));
-        } else {
-            const EWMStorageType = await this.getStorageType(this.EWMStorageBin);
+            return;
+        }
 
-            odata.setData({
+        const odata = new ODataCreateCL<IMoveHUBody>(this, "moveHUtoBin");
+        const table = this.byId("uiTreeHandlingUnit") as TreeTable
+        const selectedIndices = table.getSelectedIndices();
+        const EWMStorageType = await this.getStorageType(this.EWMStorageBin)
+
+        const contexts = selectedIndices.map(index => {
+            return ((table.getContextByIndex(index) as Context).getObject() as { HUNumber: string });
+        });
+
+        const moveHUsArray: IMoveHUtoBin[] = (contexts.map(context => {
+            return {
                 EWMWarehouse: this.EWMWarehouse,
-                SourceHandlingUnit: this.HUNumber,
+                SourceHandlingUnit: context.HUNumber,
                 DestinationStorageBin: this.EWMStorageBin,
                 DestinationStorageType: EWMStorageType,
-                WarehouseProcessType: "ZRF1",
-            });
+                WarehouseProcessType: "ZRF1"
+            };
+        }));
 
-            try {
-                await odata.create();
-                BusyIndicator.hide();
-                Messaging.addMessages(new Message({
-                    message: this.getResourceBundleText("taskCreated"),
-                    type: MessageType.Success
-                }));
-                (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);
-                this.entry.closeAndDestroyEntryDialog();
-                this.openMessagePopover();
-            } catch (error: unknown) {
-                BusyIndicator.hide();
-                this.entry.closeAndDestroyEntryDialog();
-                this.openMessagePopover();
-            }
+        const requestBody: IMoveHUBody = {
+            moveHUs: moveHUsArray
+        };
+
+        odata.setData(requestBody);
+
+        try {
+            await odata.create();
+            BusyIndicator.hide();
+            Messaging.addMessages(new Message({
+                message: this.getResourceBundleText("taskCreated"),
+                type: MessageType.Success
+            }));
+            (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);
+            this.entry.closeAndDestroyEntryDialog();
+            this.openMessagePopover();
+        } catch (error: unknown) {
+            BusyIndicator.hide();
+            this.entry.closeAndDestroyEntryDialog();
+            this.openMessagePopover();
         }
+
     }
 
     private async getStorageType(EWMStorageBin: string) {

@@ -1,5 +1,5 @@
 import { OnEventHandler, TypedRequest, connect, operator } from "@sap/cds";
-import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IMoveStorageBins, IOrderByClause } from "../../types/homepage.types";
+import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IMoveStorageBins, IOrderByClause, IMoveHUBody } from "../../types/homepage.types";
 import FilterOperations from "../util/FilterOperations";
 import DataOperations from "../util/DataOperations";
 
@@ -54,19 +54,51 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     return nodeList;
 };
 
-const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMoveStorageBins>): Promise<void> {
+const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMoveHUBody>): Promise<void> {
     try {
-        const { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse } = req.data;
-        const body = { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse };
-        const warehouseOrderSrv = await connect.to("WAREHOUSEORDER");
-        const response = await warehouseOrderSrv.send("POST", "/WarehouseTask", body);
-        req.reply(response);
+        const { moveHUs } = req.data;
 
+        await Promise.allSettled(moveHUs.map(async (item) => {
+            const { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse } = item;
+            const body = { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse };
+            const warehouseOrderSrv = await connect.to("WAREHOUSEORDER");
+
+            try {
+                const response = await warehouseOrderSrv.send("POST", "/WarehouseTask", body);
+                return response;
+            } catch (error) {
+                if (error instanceof Error) {
+                    req.error({
+                        code: 'Create-Warehouse-Task',
+                        message: error.message,
+                        target: 'EWMStorageBin',
+                        status: 500
+                    })
+                } else {
+                    req.error({
+                        code: 'Create-Warehouse-Task',
+                        message: "Failed to move handling units due to an unexpected error. Please try again later.",
+                        target: 'EWMStorageBin',
+                        status: 500
+                    })
+                }
+            }
+        }));
     } catch (error) {
         if (error instanceof Error) {
-            req.error(`${error.message}`);
+            req.error({
+                code: 'Create-Warehouse-Task',
+                message: error.message,
+                target: 'EWMStorageBin',
+                status: 500
+            })
         } else {
-            req.error("Failed to move handling units due to an unexpected error. Please try again later.");
+            req.error({
+                code: 'Create-Warehouse-Task',
+                message: "Failed to move handling units due to an unexpected error. Please try again later.",
+                target: 'EWMStorageBin',
+                status: 500
+            })
         }
     }
 }
@@ -179,7 +211,7 @@ const getAvailabilityQuantity: OnEventHandler = async function (req: TypedReques
 
     allQuantities.forEach((item: { AvailableEWMStockQty: string }) => {
         let quantityAvailability = parseFloat(item.AvailableEWMStockQty) === 0 ? 'No' : 'Yes';
-        
+
         if (!quantityAvailabilitySet.has(quantityAvailability)) {
             quantityAvailabilitySet.add(quantityAvailability);
             uniqueQuantities.push({ QuantityAvailability: quantityAvailability });

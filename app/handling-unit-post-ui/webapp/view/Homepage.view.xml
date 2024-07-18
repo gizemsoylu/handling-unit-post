@@ -35,7 +35,11 @@
                     useProvidedNavigationProperties="true"
                     enableBasicSearch="false"
                     showFilterConfiguration="false"
-                />
+                >
+                <smartFilterBar:controlConfiguration>
+						<smartFilterBar:ControlConfiguration key="EWMWarehouse" mandatory="mandatory" visibleInAdvancedArea="true"/>
+					</smartFilterBar:controlConfiguration>
+                </smartFilterBar:SmartFilterBar>
                 <smartTable:SmartTable
                     id="stHandlingUnit"
                     entitySet="HandlingUnits"
@@ -46,7 +50,7 @@
                     showRowCount="false"
                     enableCopy="false"
                     enableExport="false"
-                    enableAutoBinding="true"
+                    enableAutoBinding="false"
                     editTogglable="false"
                     app:useSmartToggle="false"
                     showFullScreenButton="true"
@@ -68,9 +72,10 @@
                     </smartTable:layoutData>
                     <table:TreeTable
                         id="uiTreeHandlingUnit"
-                        selectionMode="Single"
+                        selectionMode="MultiToggle"
                         rowSelectionChange="onHUSelectionChange"
                         threshold="20"
+                        enableSelectAll="false"
                     >
                         <table:rowSettingsTemplate>
                             <table:RowSettings

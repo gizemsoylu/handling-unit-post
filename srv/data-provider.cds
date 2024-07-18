@@ -1,6 +1,7 @@
 using {
     HandlingUnits as DBHandlingUnits,
-    StorageBins   as DBStorageBins
+    StorageBins   as DBStorageBins,
+    moveHU        as TypeMoveHU
 } from '../db/data-models';
 
 
@@ -11,19 +12,15 @@ service HandlingUnitPost {
     /********************************************************************************************************/
 
     @cds.redirection.target: true
-    entity HandlingUnits as projection on DBHandlingUnits;
+    entity HandlingUnits          as projection on DBHandlingUnits;
 
-    entity StorageBins   as projection on DBStorageBins;
+    entity StorageBins            as projection on DBStorageBins;
 
     /********************************************************************************************************/
     /* Action - Function Imports                                                                            */
     /********************************************************************************************************/
 
-    action   moveHUtoBin(EWMWarehouse : String,
-                         SourceHandlingUnit : String,
-                         WarehouseProcessType : String,
-                         DestinationStorageType : String,
-                         DestinationStorageBin : String);
+    action   moveHUtoBin(moveHUs : array of TypeMoveHU);
 
     function getStorageBins(EWMWarehouse : String) returns array of {
         EWMWarehouse : String;
@@ -35,26 +32,26 @@ service HandlingUnitPost {
     /* ValueHelp Views                                                                        */
     /********************************************************************************************************/
     @readonly
-    entity VHStatus      as select distinct key HUStatus from DBHandlingUnits;
+    entity VHStatus               as select distinct key HUStatus from DBHandlingUnits;
 
     @readonly
-    entity VHWarehouses as select distinct key EWMWarehouse from DBHandlingUnits;
-    
-    @readonly
-    entity VHHUNumbers as select distinct key HUNumber from DBHandlingUnits;
+    entity VHWarehouses           as select distinct key EWMWarehouse from DBHandlingUnits;
 
     @readonly
-    entity VHMaterials as select distinct key MaterialNumber from DBHandlingUnits;
+    entity VHHUNumbers            as select distinct key HUNumber from DBHandlingUnits;
 
     @readonly
-    entity VHOrders as select distinct key ProductionOrder  from DBHandlingUnits;
+    entity VHMaterials            as select distinct key MaterialNumber from DBHandlingUnits;
 
     @readonly
-    entity VHStorageBins as select distinct key EWMStorageBin  from DBHandlingUnits;
+    entity VHOrders               as select distinct key ProductionOrder from DBHandlingUnits;
 
     @readonly
-    entity VHStorageTypes as select distinct key EWMStorageType  from DBHandlingUnits;
+    entity VHStorageBins          as select distinct key EWMStorageBin from DBHandlingUnits;
 
     @readonly
-    entity VHAvailabilityQuantity as select distinct key QuantityAvailability  from DBHandlingUnits;
+    entity VHStorageTypes         as select distinct key EWMStorageType from DBHandlingUnits;
+
+    @readonly
+    entity VHAvailabilityQuantity as select distinct key QuantityAvailability from DBHandlingUnits;
 }

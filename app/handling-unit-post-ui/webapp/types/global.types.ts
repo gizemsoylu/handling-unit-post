@@ -45,6 +45,6 @@ export interface IMoveHUtoBin {
     DestinationStorageBin: string;
 }
 
-export interface IFailedResponse {
-    responseText:string
+export interface IMoveHUBody {
+    moveHUs: IMoveHUtoBin[];
 }

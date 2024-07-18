@@ -66,6 +66,9 @@ export interface IMoveStorageBins {
     DestinationStorageBin: string;
 }
 
+export interface IMoveHUBody {
+    moveHUs: IMoveStorageBins[]
+}
 export interface IWhereClause {
     ref: string[];
     val: number | string | Date | null;

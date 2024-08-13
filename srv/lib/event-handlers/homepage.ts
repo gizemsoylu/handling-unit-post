@@ -6,20 +6,20 @@ import DataOperations from "../util/DataOperations";
 const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHandlingUnits>): Promise<IHandlingUnits[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
     const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
-
-    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm));
-
+    
+    let huPallets = await handlingCDS.run(
+        SELECT.from(YY1_HUInfoPalletbox_ewm).where({
+            PackagingMaterialType: ['Z001', 'Z002']
+        })
+    );
+    
     const dataOperations = new DataOperations();
     const filterOperations = new FilterOperations();
-
+    
     const parentNodeMap: { [key: string]: number } = {};
     let nodeList: IHandlingUnitsArray = [];
     let nodeId = 1;
-
-    huPallets = huPallets.filter((huItems: IHandlingUnitItems) => 
-        huItems.PackagingMaterialType === 'Z001' || huItems.PackagingMaterialType === 'Z002'
-    );
-
+    
     huPallets.forEach((huItems: IHandlingUnitItems) => {
 
         huItems = dataOperations.formatHUItems(huItems);
@@ -105,9 +105,11 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
 
 const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitStatus: string }[]>): Promise<{ HUStatus: string }[]> {
     const DataOperation = new DataOperations()
-    const handlingCDS = await connect.to("HUPalletEWM");
-    const { YY1_HUPalletEWM } = handlingCDS.entities;
-    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUPalletEWM).columns('HandlingUnitStatus'));
+    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+    const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
+    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm).columns('HandlingUnitStatus').where({
+        PackagingMaterialType: ['Z001', 'Z002']
+    }));
     const uniqueStatuses = [...new Set<string>(huPallets.map((item: { HandlingUnitStatus: string; }) => item.HandlingUnitStatus))];
     const formattedStatuses = uniqueStatuses.map(status => ({ HUStatus: DataOperation.convertStatus(status) }));
 
@@ -115,8 +117,10 @@ const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<
 }
 
 const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedRequest<{ EWMWarehouse: string }[]>): Promise<{ EWMWarehouse: string }[]> {
-    const handlingCDS = await connect.to("HUPalletEWM");
-    const allEWMWarehouses = await handlingCDS.run(SELECT.from('YY1_HUPalletEWM').columns('EWMWarehouse'));
+    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+    const allEWMWarehouses = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('EWMWarehouse').where({
+        PackagingMaterialType: ['Z001', 'Z002']
+    }));
     let uniqueEWMWarehouses: { EWMWarehouse: string }[] = [];
 
     allEWMWarehouses.forEach((item: { EWMWarehouse: string; }) => {
@@ -129,8 +133,10 @@ const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedReque
 }
 
 const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitNumber: string }[]>): Promise<{ HUNumber: string }[]> {
-    const handlingCDS = await connect.to("HUPalletEWM");
-    const allHUs = await handlingCDS.run(SELECT.from('YY1_HUPalletEWM').columns('HandlingUnitNumber'));
+    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+    const allHUs = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('HandlingUnitNumber').where({
+        PackagingMaterialType: ['Z001', 'Z002']
+    }));
     let uniqueHUs: { HUNumber: string }[] = [];
 
     allHUs.forEach((item: { HandlingUnitNumber: string; }) => {
@@ -143,8 +149,10 @@ const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest
 }
 
 const getMaterials: OnEventHandler = async function (req: TypedRequest<{ MaterialNumber: string }[]>): Promise<{ MaterialNumber: string }[]> {
-    const handlingCDS = await connect.to("HUPalletEWM");
-    const allMaterials = await handlingCDS.run(SELECT.from('YY1_HUPalletEWM').columns('MaterialNumber'));
+    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+    const allMaterials = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('MaterialNumber').where({
+        PackagingMaterialType: ['Z001', 'Z002']
+    }));
     let uniqueMaterials: { MaterialNumber: string }[] = [];
 
     allMaterials.forEach((item: { MaterialNumber: string; }) => {
@@ -172,7 +180,9 @@ const getVHStorageBins: OnEventHandler = async function (req: TypedRequest<{ EWM
 
 const getStorageTypes: OnEventHandler = async function (req: TypedRequest<{ EWMStorageType_1: string }[]>): Promise<{ EWMStorageType: string }[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allStorageTypes = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('EWMStorageType_1'));
+    const allStorageTypes = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('EWMStorageType_1').where({
+        PackagingMaterialType: ['Z001', 'Z002']
+    }));
     let uniqueStorageTypes: { EWMStorageType: string }[] = [];
 
     allStorageTypes.forEach((item: { EWMStorageType_1: string; }) => {
@@ -185,8 +195,8 @@ const getStorageTypes: OnEventHandler = async function (req: TypedRequest<{ EWMS
 }
 
 const getProductionOrders: OnEventHandler = async function (req: TypedRequest<{ ProductionOrder: string }[]>): Promise<{ ProductionOrder: string }[]> {
-    const handlingCDS = await connect.to("HUPalletEWM");
-    const allOrders = await handlingCDS.run(SELECT.from('YY1_HUPalletEWM').columns('ProductionOrder'));
+    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+    const allOrders = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('ProductionOrder'));
     let uniqueOrders: { ProductionOrder: string }[] = [];
 
     allOrders.forEach((item: { ProductionOrder: string; }) => {
@@ -200,7 +210,9 @@ const getProductionOrders: OnEventHandler = async function (req: TypedRequest<{ 
 
 const getAvailabilityQuantity: OnEventHandler = async function (req: TypedRequest<{ AvailableEWMStockQty: string }[]>): Promise<{ QuantityAvailability: string }[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allQuantities = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('AvailableEWMStockQty'));
+    const allQuantities = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('AvailableEWMStockQty').where({
+        PackagingMaterialType: ['Z001', 'Z002']
+    }));
     let uniqueQuantities: { QuantityAvailability: string }[] = [];
     let quantityAvailabilitySet = new Set<string>();
 

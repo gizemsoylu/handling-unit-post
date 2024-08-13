@@ -25,6 +25,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         if (details) {
             huItems.EWMStorageBin = details.EWMStorageBin_1;
             huItems.EWMStorageType = details.EWMStorageType_1;
+            huItems.QuantityPerHu = details.EWMStockQuantityInBaseUnit;
         }
 
         huItems = dataOperations.formatHUItems(huItems);

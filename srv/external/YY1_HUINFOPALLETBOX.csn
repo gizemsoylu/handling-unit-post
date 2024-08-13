@@ -151,7 +151,7 @@
      "type": "cds.String",
      "length": 20,
      "@sap.required.in.filter": "false",
-     "@sap.label": "ProductionOrder",
+     "@sap.label": "ProductionOrder (plan)",
      "@sap.quickinfo": "Text of length 20"
     },
     "EWMHUProcessStepIsCompleted": {
@@ -236,6 +236,59 @@
      "length": 3,
      "@sap.required.in.filter": "false",
      "@sap.label": "Base Unit of Measure",
+     "@sap.semantics": "unit-of-measure"
+    },
+    "EWMStockQuantityInBaseUnit": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "@sap.required.in.filter": "false",
+     "@sap.unit": "EWMStockQuantityBaseUnit",
+     "@sap.label": "Phys Stock Quantity in Base Unit (box)",
+     "@sap.quickinfo": "Quantity in Base Unit of Measure"
+    },
+    "EWMStockQuantityInBaseUnit_1": {
+     "type": "cds.Decimal",
+     "precision": 31,
+     "scale": 14,
+     "@sap.required.in.filter": "false",
+     "@sap.unit": "EWMStockQuantityBaseUnit",
+     "@sap.label": "Phys Stock Quantity in Base Unit (unp box)",
+     "@sap.quickinfo": "Quantity in Base Unit of Measure"
+    },
+    "YY1_PlannedProdOrder_HUH": {
+     "type": "cds.String",
+     "length": 12,
+     "@sap.display.format": "NonNegative",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Planned Production Order"
+    },
+    "YY1_PlannedQuantity_HUH": {
+     "type": "cds.Decimal",
+     "precision": 15,
+     "scale": 3,
+     "@sap.required.in.filter": "false",
+     "@sap.unit": "YY1_PlannedQuantity_HUHU",
+     "@sap.label": "Planned Quantity"
+    },
+    "YY1_PlannedPlant_HUH": {
+     "type": "cds.String",
+     "length": 4,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Planned Plant"
+    },
+    "YY1_PlannedMaterial_HUH": {
+     "type": "cds.String",
+     "length": 40,
+     "@sap.display.format": "UpperCase",
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Planned Material"
+    },
+    "YY1_PlannedQuantity_HUHU": {
+     "type": "cds.String",
+     "length": 3,
+     "@sap.required.in.filter": "false",
+     "@sap.label": "Planned Quantity (Unit)",
      "@sap.semantics": "unit-of-measure"
     }
    }

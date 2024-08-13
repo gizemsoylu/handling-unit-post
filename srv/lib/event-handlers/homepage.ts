@@ -4,13 +4,10 @@ import FilterOperations from "../util/FilterOperations";
 import DataOperations from "../util/DataOperations";
 
 const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHandlingUnits>): Promise<IHandlingUnits[]> {
-    const handlingCDS = await connect.to("HUPalletEWM");
-    const handlingDetailCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const { YY1_HUPalletEWM } = handlingCDS.entities;
-    const { YY1_HUInfoPalletbox_ewm } = handlingDetailCDS.entities;
+    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+    const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
 
-    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUPalletEWM));
-    let huDetails = await handlingDetailCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm));
+    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm));
 
     const dataOperations = new DataOperations();
     const filterOperations = new FilterOperations();
@@ -19,27 +16,24 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     let nodeList: IHandlingUnitsArray = [];
     let nodeId = 1;
 
-    huPallets.forEach((huItems: IHandlingUnitItems) => {
-        const details = huDetails.find(detail => detail.HandlingUnitNumber === huItems.HandlingUnitNumber);
+    huPallets = huPallets.filter((huItems: IHandlingUnitItems) => 
+        huItems.PackagingMaterialType === 'Z001' || huItems.PackagingMaterialType === 'Z002'
+    );
 
-        if (details) {
-            huItems.EWMStorageBin = details.EWMStorageBin_1;
-            huItems.EWMStorageType = details.EWMStorageType_1;
-            huItems.QuantityPerHu = details.EWMStockQuantityInBaseUnit;
-        }
+    huPallets.forEach((huItems: IHandlingUnitItems) => {
 
         huItems = dataOperations.formatHUItems(huItems);
 
-        let result = dataOperations.handleParentNode(huItems, parentNodeMap, nodeList, nodeId, huDetails);
+        let result = dataOperations.handleParentNode(huItems, parentNodeMap, nodeList, nodeId);
         nodeList = result.nodeList;
         nodeId = result.nodeId;
 
-        result = dataOperations.handleChildNode(huItems, parentNodeMap, nodeList, nodeId, huDetails);
+        result = dataOperations.handleChildNode(huItems, parentNodeMap, nodeList, nodeId);
         nodeList = result.nodeList;
         nodeId = result.nodeId;
     });
 
-    nodeList = dataOperations.updateNodeList(nodeList, huDetails);
+    nodeList = dataOperations.updateNodeList(nodeList);
 
     if (req.query.SELECT?.where) {
         const filters = req.query.SELECT.where as unknown as IWhereClause[];

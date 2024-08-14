@@ -71,7 +71,7 @@ export default class DataOperations {
             parentNodeMap[huItems.SubHUNumber] = nodeId;
             nodeList.push({
                 ...huItems,
-                QuantityAvailability: huItems.QuantityPerHU === 0 ? 'No' : 'Yes',
+                QuantityAvailability: huItems.EWMStockQuantityInBaseUnit === 0 ? 'No' : 'Yes',
                 HUNumber: huItems.SubHUNumber.replace(/^0+/, ''),
                 PackagingMaterial: "BOX",
                 SubHUNumber: "",

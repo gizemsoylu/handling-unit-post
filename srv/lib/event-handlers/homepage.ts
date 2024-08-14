@@ -6,33 +6,33 @@ import DataOperations from "../util/DataOperations";
 const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHandlingUnits>): Promise<IHandlingUnits[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
     const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
-    
+
     let huPallets = await handlingCDS.run(
-        SELECT.from(YY1_HUInfoPalletbox_ewm).where({
-            PackagingMaterialType: ['Z001', 'Z002']
-        })
-    );
-    
+        SELECT.from(YY1_HUInfoPalletbox_ewm));
+
     const dataOperations = new DataOperations();
     const filterOperations = new FilterOperations();
-    
-    const parentNodeMap: { [key: string]: number } = {};
+
+    const parentNodeMap = new Map<string, { nodeId: number, subNodes: string[] }>();
     let nodeList: IHandlingUnitsArray = [];
     let nodeId = 1;
-    
+
     huPallets.forEach((huItems: IHandlingUnitItems) => {
-
         huItems = dataOperations.formatHUItems(huItems);
+    });
 
-        let result = dataOperations.handleParentNode(huItems, parentNodeMap, nodeList, nodeId);
-        nodeList = result.nodeList;
-        nodeId = result.nodeId;
-
-        result = dataOperations.handleChildNode(huItems, parentNodeMap, nodeList, nodeId);
+    huPallets.forEach(huItems => {
+        const result = dataOperations.handleParentNode(huItems, parentNodeMap, nodeList, nodeId);
         nodeList = result.nodeList;
         nodeId = result.nodeId;
     });
-
+    
+    huPallets.forEach(huItems => {
+        const result = dataOperations.handleChildNodes(parentNodeMap, huItems, nodeList, nodeId);
+        nodeList = result.nodeList;
+        nodeId = result.nodeId;
+    });
+    
     nodeList = dataOperations.updateNodeList(nodeList);
 
     if (req.query.SELECT?.where) {

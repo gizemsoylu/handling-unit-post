@@ -28,6 +28,9 @@ export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
 }
 
 export interface IHandlingUnitItems {
+    EWMStockQuantityInBaseUnit_1: number;
+    HandlingUnitBottomInd: any;
+    HandlingUnitTopLevelInd: any;
     EWMStorageBin_1: string;
     EWMStorageType_1: string;
     PackagingMaterialType: string;

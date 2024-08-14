@@ -27,25 +27,30 @@ export default class DataOperations {
         huItems.EWMStorageType = huItems.EWMStorageType_1 || '';
         huItems.PackagingMaterialType = huItems.PackagingMaterialType || '';
         huItems.PackagingMaterialType = huItems.PackagingMaterialType || '';
+        huItems.HandlingUnitTopLevelInd = huItems.HandlingUnitTopLevelInd || '',
+            huItems.HandlingUnitBottomInd = huItems.HandlingUnitBottomInd || ''
         return huItems;
     }
 
     public handleParentNode(
         huItems: IHandlingUnitItems,
-        parentNodeMap: { [key: string]: number },
+        parentNodeMap: Map<string, { nodeId: number, subNodes: string[] }>,
         nodeList: IHandlingUnitsArray,
         nodeId: number
     ): { nodeList: IHandlingUnitsArray, nodeId: number } {
 
-        if (huItems.PackagingMaterialType === 'Z002') {
-            if (!parentNodeMap[huItems.HUNumber]) {
+        if (huItems.HandlingUnitTopLevelInd) {
+            if (!parentNodeMap.has(huItems.HUNumber)) {
+                parentNodeMap.set(huItems.HUNumber, {
+                    nodeId: nodeId,
+                    subNodes: []
+                });
 
-                parentNodeMap[huItems.HUNumber] = nodeId;
                 nodeList.push({
                     ...huItems,
                     QuantityAvailability: huItems.AvailableEWMStockQty === 0 ? 'No' : 'Yes',
                     ProductionOrder: "",
-                    PackagingMaterial: "PALLET",
+                    PackagingMaterial: huItems.PackagingMaterialType,
                     NodeID: nodeId,
                     HierarchyLevel: 0,
                     ParentNodeID: null,
@@ -54,37 +59,58 @@ export default class DataOperations {
                     EWMStorageBin: huItems.EWMStorageBin_1,
                     EWMStorageType: huItems.EWMStorageType_1
                 });
+
                 nodeId++;
+            }
+
+            if (huItems.SubHUNumber) {
+                const parentHUData = parentNodeMap.get(huItems.HUNumber);
+                if (parentHUData) {
+                    parentHUData.subNodes.push(huItems.SubHUNumber);
+                }
             }
         }
 
         return { nodeList, nodeId };
     }
 
-    public handleChildNode(
+    public handleChildNodes(
+        parentNodeMap: Map<string, { nodeId: number, subNodes: string[] }>,
         huItems: IHandlingUnitItems,
-        parentNodeMap: { [key: string]: number },
         nodeList: IHandlingUnitsArray,
-        nodeId: number,
+        nodeId: number
     ): { nodeList: IHandlingUnitsArray, nodeId: number } {
-        if (huItems.SubHUNumber) {
-            parentNodeMap[huItems.SubHUNumber] = nodeId;
-            nodeList.push({
-                ...huItems,
-                QuantityAvailability: huItems.QuantityPerHU === 0 ? 'No' : 'Yes',
-                HUNumber: huItems.SubHUNumber.replace(/^0+/, ''),
-                PackagingMaterial: "BOX",
-                SubHUNumber: "",
-                NodeID: nodeId,
-                HierarchyLevel: 1,
-                ParentNodeID: parentNodeMap[huItems.HUNumber],
-                DrillState: "collapse",
-                QuantityPerHU: +huItems.EWMStockQuantityInBaseUnit || 0,
-                EWMStorageBin: huItems.EWMStorageBin_1,
-                EWMStorageType: huItems.EWMStorageType_1
-            });
-            nodeId++;
+
+        for (let [parentHU, parentNode] of parentNodeMap.entries()) {
+            if (parentNode.subNodes.includes(huItems.HUNumber)) {
+                const parentStorageBins = nodeList
+                    .filter(item => item.NodeID === parentNode.nodeId)
+                    .map(item => item.EWMStorageBin);
+
+                const parentStorageTypes = nodeList
+                    .filter(item => item.NodeID === parentNode.nodeId)
+                    .map(item => item.EWMStorageType);
+
+                nodeList.push({
+                    ...huItems,
+                    QuantityAvailability: huItems.EWMStockQuantityInBaseUnit_1 === 0 ? 'No' : 'Yes',
+                    HUNumber: huItems.HUNumber.replace(/^0+/, ''),
+                    PackagingMaterial: huItems.PackagingMaterialType,
+                    SubHUNumber: "",
+                    NodeID: nodeId,
+                    HierarchyLevel: 1,
+                    ParentNodeID: parentNode.nodeId,
+                    DrillState: "collapse",
+                    QuantityPerHU: +huItems.EWMStockQuantityInBaseUnit_1 || 0,
+                    EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
+                    EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : ""
+                });
+
+                nodeId++;
+                break;
+            }
         }
+
         return { nodeList, nodeId };
     }
 

@@ -211,7 +211,7 @@ const getAvailabilityQuantity: OnEventHandler = async function (req: TypedReques
     let quantityAvailabilitySet = new Set<string>();
 
     allQuantities.forEach((item: { AvailableEWMStockQty: string }) => {
-        let quantityAvailability = parseFloat(item.AvailableEWMStockQty) === 0 ? 'No' : 'Yes';
+        let quantityAvailability = parseFloat(item.AvailableEWMStockQty) === 0 ? 'Yes' : 'No';
 
         if (!quantityAvailabilitySet.has(quantityAvailability)) {
             quantityAvailabilitySet.add(quantityAvailability);

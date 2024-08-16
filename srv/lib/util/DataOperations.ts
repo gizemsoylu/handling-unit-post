@@ -15,9 +15,9 @@ export default class DataOperations {
     }
 
     public formatHUItems(huItems: IHandlingUnitItems): IHandlingUnitItems {
-        huItems.QuantityPerHU = huItems.QuantityPerHu ? +huItems.QuantityPerHu : 0;
+        huItems.QuantityPerHU = huItems.AvailableEWMStockQty ? +huItems.AvailableEWMStockQty : 0;
         huItems.HUNumber = huItems.HandlingUnitNumber.replace(/^0+/, '');
-        huItems.SubHUNumber = huItems.HandlingUnitNumber_1.replace(/^0+/, '');
+        huItems.SubHUNumber = huItems.HandlingUnitNumber !== huItems.HandlingUnitNumber_1 ? huItems.HandlingUnitNumber_1.replace(/^0+/, '') : "";
         huItems.HUType = huItems.HandlingUnitType;
         huItems.HUStatus = this.convertStatus(huItems.HandlingUnitStatus);
         huItems.SubEWMWarehouse = huItems.EWMWarehouse_1;
@@ -48,7 +48,7 @@ export default class DataOperations {
 
                 nodeList.push({
                     ...huItems,
-                    QuantityAvailability: huItems.AvailableEWMStockQty === 0 ? 'No' : 'Yes',
+                    QuantityAvailability: huItems.AvailableEWMStockQty === 0 ? 'Yes' : 'No',
                     ProductionOrder: "",
                     PackagingMaterial: huItems.PackagingMaterialType,
                     NodeID: nodeId,
@@ -94,7 +94,7 @@ export default class DataOperations {
     
                     nodeList.push({
                         ...huItems,
-                        QuantityAvailability: huItems.EWMStockQuantityInBaseUnit_1 === 0 ? 'No' : 'Yes',
+                        QuantityAvailability: huItems.EWMStockQuantityInBaseUnit_1 === 0 ? 'Yes' : 'No',
                         HUNumber: huItems.HUNumber.replace(/^0+/, ''),
                         PackagingMaterial: huItems.PackagingMaterialType,
                         SubHUNumber: "",

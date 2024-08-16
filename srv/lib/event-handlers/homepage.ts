@@ -107,9 +107,7 @@ const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<
     const DataOperation = new DataOperations()
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
     const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
-    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm).columns('HandlingUnitStatus').where({
-        PackagingMaterialType: ['Z001', 'Z002']
-    }));
+    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm).columns('HandlingUnitStatus'));
     const uniqueStatuses = [...new Set<string>(huPallets.map((item: { HandlingUnitStatus: string; }) => item.HandlingUnitStatus))];
     const formattedStatuses = uniqueStatuses.map(status => ({ HUStatus: DataOperation.convertStatus(status) }));
 
@@ -150,9 +148,7 @@ const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest
 
 const getMaterials: OnEventHandler = async function (req: TypedRequest<{ MaterialNumber: string }[]>): Promise<{ MaterialNumber: string }[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allMaterials = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('MaterialNumber').where({
-        PackagingMaterialType: ['Z001', 'Z002']
-    }));
+    const allMaterials = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('MaterialNumber'));
     let uniqueMaterials: { MaterialNumber: string }[] = [];
 
     allMaterials.forEach((item: { MaterialNumber: string; }) => {
@@ -210,9 +206,7 @@ const getProductionOrders: OnEventHandler = async function (req: TypedRequest<{ 
 
 const getAvailabilityQuantity: OnEventHandler = async function (req: TypedRequest<{ AvailableEWMStockQty: string }[]>): Promise<{ QuantityAvailability: string }[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allQuantities = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('AvailableEWMStockQty').where({
-        PackagingMaterialType: ['Z001', 'Z002']
-    }));
+    const allQuantities = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('AvailableEWMStockQty'));
     let uniqueQuantities: { QuantityAvailability: string }[] = [];
     let quantityAvailabilitySet = new Set<string>();
 

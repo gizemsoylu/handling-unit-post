@@ -81,36 +81,38 @@ export default class DataOperations {
         nodeId: number
     ): { nodeList: IHandlingUnitsArray, nodeId: number } {
 
-        for (let [parentHU, parentNode] of parentNodeMap.entries()) {
-            if (parentNode.subNodes.includes(huItems.HUNumber)) {
-                const parentStorageBins = nodeList
-                    .filter(item => item.NodeID === parentNode.nodeId)
-                    .map(item => item.EWMStorageBin);
-
-                const parentStorageTypes = nodeList
-                    .filter(item => item.NodeID === parentNode.nodeId)
-                    .map(item => item.EWMStorageType);
-
-                nodeList.push({
-                    ...huItems,
-                    QuantityAvailability: huItems.EWMStockQuantityInBaseUnit_1 === 0 ? 'No' : 'Yes',
-                    HUNumber: huItems.HUNumber.replace(/^0+/, ''),
-                    PackagingMaterial: huItems.PackagingMaterialType,
-                    SubHUNumber: "",
-                    NodeID: nodeId,
-                    HierarchyLevel: 1,
-                    ParentNodeID: parentNode.nodeId,
-                    DrillState: "collapse",
-                    QuantityPerHU: +huItems.EWMStockQuantityInBaseUnit_1 || 0,
-                    EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
-                    EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : ""
-                });
-
-                nodeId++;
-                break;
+        if(huItems.HUNumber !== huItems.SubHUNumber){
+            for (let [parentHU, parentNode] of parentNodeMap.entries()) {
+                if (parentNode.subNodes.includes(huItems.HUNumber)) { 
+                    const parentStorageBins = nodeList
+                        .filter(item => item.NodeID === parentNode.nodeId)
+                        .map(item => item.EWMStorageBin);
+    
+                    const parentStorageTypes = nodeList
+                        .filter(item => item.NodeID === parentNode.nodeId)
+                        .map(item => item.EWMStorageType);
+    
+                    nodeList.push({
+                        ...huItems,
+                        QuantityAvailability: huItems.EWMStockQuantityInBaseUnit_1 === 0 ? 'No' : 'Yes',
+                        HUNumber: huItems.HUNumber.replace(/^0+/, ''),
+                        PackagingMaterial: huItems.PackagingMaterialType,
+                        SubHUNumber: "",
+                        NodeID: nodeId,
+                        HierarchyLevel: 1,
+                        ParentNodeID: parentNode.nodeId,
+                        DrillState: "collapse",
+                        QuantityPerHU: +huItems.EWMStockQuantityInBaseUnit_1 || 0,
+                        EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
+                        EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : ""
+                    });
+    
+                    nodeId++;
+                    break;
+                }
             }
         }
-
+ 
         return { nodeList, nodeId };
     }
 

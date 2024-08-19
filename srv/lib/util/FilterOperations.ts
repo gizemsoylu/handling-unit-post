@@ -23,6 +23,12 @@ export default class FilterOperations {
                     }
                     if (filter.hasOwnProperty('val')) {
                         currentValue = filter.val;
+                        
+                        // Ignore filter when QuantityAvailability is equal 'Yes'
+                        if (currentField === 'QuantityAvailability' && currentValue === 'Yes') {
+                            continue; 
+                        }
+
                         isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
                     }
                 }

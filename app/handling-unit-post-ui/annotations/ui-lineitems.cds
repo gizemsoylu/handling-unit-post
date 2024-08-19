@@ -12,7 +12,7 @@ annotate service.HandlingUnits with @(UI: {
     SelectionFields: [
         EWMWarehouse,
         HUNumber,
-        MaterialNumber,
+        Product,
         EWMStorageBin,
         EWMStorageType,
         ProductionOrder,
@@ -39,7 +39,7 @@ annotate service.HandlingUnits with @(UI: {
         },
         {
             $Type                : 'UI.DataField',
-            Value                : MaterialNumber,
+            Value                : Product,
             ![@HTML5.CssDefaults]: {
                 $Type: 'HTML5.CssDefaultsType',
                 width: '12rem',

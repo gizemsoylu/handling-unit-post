@@ -146,18 +146,18 @@ const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest
     return uniqueHUs;
 }
 
-const getMaterials: OnEventHandler = async function (req: TypedRequest<{ MaterialNumber: string }[]>): Promise<{ MaterialNumber: string }[]> {
+const getProducts: OnEventHandler = async function (req: TypedRequest<{ Product: string }[]>): Promise<{ Product: string }[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allMaterials = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('MaterialNumber'));
-    let uniqueMaterials: { MaterialNumber: string }[] = [];
+    const allProduct = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('Product'));
+    let uniqueProduct: { Product: string }[] = [];
 
-    allMaterials.forEach((item: { MaterialNumber: string; }) => {
-        if (item.MaterialNumber !== '' && !uniqueMaterials.some(warehouse => warehouse.MaterialNumber === item.MaterialNumber)) {
-            uniqueMaterials.push({ MaterialNumber: item.MaterialNumber });
+    allProduct.forEach((item: { Product: string; }) => {
+        if (item.Product !== '' && !uniqueProduct.some(warehouse => warehouse.Product === item.Product)) {
+            uniqueProduct.push({ Product: item.Product });
         }
     });
 
-    return uniqueMaterials;
+    return uniqueProduct;
 }
 
 const getVHStorageBins: OnEventHandler = async function (req: TypedRequest<{ EWMStorageBin_1: string }[]>): Promise<{ EWMStorageBin: string }[]> {
@@ -259,5 +259,5 @@ export {
     getAvailabilityQuantity,
     getVHStorageBins,
     getStorageTypes,
-    getMaterials
+    getProducts
 }

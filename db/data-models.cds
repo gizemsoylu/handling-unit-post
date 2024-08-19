@@ -8,7 +8,7 @@ entity HandlingUnits {
         DrillState                  : String;
         HUStatus                    : String;
         HUType                      : String;
-        MaterialNumber              : String;
+        Product                     : String;
         PackagingMaterial           : String;
         PackagingMaterialType       : String;
         ProductionOrder             : String;

@@ -9,7 +9,7 @@ annotate service.HandlingUnits with {
     DrillState                  @Common.Label: '{i18n>DrillState}';
     HUStatus                    @Common.Label: '{i18n>HUStatus}';
     HUType                      @Common.Label: '{i18n>HUType}';
-    MaterialNumber              @Common.Label: '{i18n>MaterialNumber}';
+    Product                     @Common.Label: '{i18n>Product}';
     PackagingMaterial           @Common.Label: '{i18n>PackagingMaterial}';
     PackagingMaterialType       @Common.Label: '{i18n>PackagingMaterialType}';
     ProductionOrder             @Common.Label: '{i18n>ProductionOrder}';

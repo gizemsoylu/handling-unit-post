@@ -28,7 +28,7 @@ export default class DataOperations {
         huItems.PackagingMaterialType = huItems.PackagingMaterialType || '';
         huItems.PackagingMaterialType = huItems.PackagingMaterialType || '';
         huItems.HandlingUnitTopLevelInd = huItems.HandlingUnitTopLevelInd || '',
-            huItems.HandlingUnitBottomInd = huItems.HandlingUnitBottomInd || ''
+        huItems.HandlingUnitBottomInd = huItems.HandlingUnitBottomInd || ''
         return huItems;
     }
 
@@ -57,7 +57,8 @@ export default class DataOperations {
                     DrillState: "expanded",
                     QuantityPerHU: +huItems.AvailableEWMStockQty,
                     EWMStorageBin: huItems.EWMStorageBin_1,
-                    EWMStorageType: huItems.EWMStorageType_1
+                    EWMStorageType: huItems.EWMStorageType_1,
+                    Product: huItems.Product,
                 });
 
                 nodeId++;
@@ -104,7 +105,8 @@ export default class DataOperations {
                         DrillState: "collapse",
                         QuantityPerHU: +huItems.EWMStockQuantityInBaseUnit_1 || 0,
                         EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
-                        EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : ""
+                        EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : "",
+                        Product: huItems.Product
                     });
     
                     nodeId++;
@@ -125,10 +127,10 @@ export default class DataOperations {
                 node.SubHUNumber = hasChild ? "" : node.SubHUNumber;
 
                 if (hasChild) {
-                    const allSameMaterial = childNodes.every(child => child.MaterialNumber === childNodes[0].MaterialNumber);
+                    const allSameMaterial = childNodes.every(child => child.Product === childNodes[0].Product);
                     const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
                     const allIsCompleted = childNodes.every(child => child.EWMHUProcessStepIsCompleted === childNodes[0].EWMHUProcessStepIsCompleted);
-                    node.MaterialNumber = allSameMaterial ? childNodes[0].MaterialNumber : "Multiple Materials";
+                    node.Product = allSameMaterial ? childNodes[0].Product : "Multiple Materials";
                     node.HUStatus = allSameStatus ? childNodes[0].HUStatus : "";
                     node.EWMHUProcessStepIsCompleted = allIsCompleted ? childNodes[0].EWMHUProcessStepIsCompleted : false;
                 }

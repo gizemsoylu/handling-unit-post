@@ -35,14 +35,14 @@ annotate service.HandlingUnits {
         }]
     };
 
-    MaterialNumber       @Common.ValueList: {
+    Product       @Common.ValueList: {
         $Type         : 'Common.ValueListType',
-        CollectionPath: 'VHMaterials',
+        CollectionPath: 'VHProducts',
         SearchSupported,
         Parameters    : [{
             $Type            : 'Common.ValueListParameterInOut',
-            LocalDataProperty: MaterialNumber,
-            ValueListProperty: 'MaterialNumber'
+            LocalDataProperty: Product,
+            ValueListProperty: 'Product'
         }]
     };
     EWMStorageBin        @Common.ValueList: {

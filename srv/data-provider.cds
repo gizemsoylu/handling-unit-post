@@ -41,7 +41,7 @@ service HandlingUnitPost {
     entity VHHUNumbers            as select distinct key HUNumber from DBHandlingUnits;
 
     @readonly
-    entity VHMaterials            as select distinct key MaterialNumber from DBHandlingUnits;
+    entity VHProducts             as select distinct key Product from DBHandlingUnits;
 
     @readonly
     entity VHOrders               as select distinct key ProductionOrder from DBHandlingUnits;

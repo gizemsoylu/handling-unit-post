@@ -1,4 +1,5 @@
 export interface IHandlingUnits {
+    Product: string;
     NodeID: number
     HierarchyLevel: number;
     ParentNodeID?: number | null;
@@ -7,7 +8,6 @@ export interface IHandlingUnits {
     SubHUNumber?: string;
     HUStatus: string;
     HUType?: string;
-    MaterialNumber?: string;
     PackagingMaterial?: string;
     PackagingMaterialType?: string;
     ProductionOrder?: string;
@@ -28,6 +28,7 @@ export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
 }
 
 export interface IHandlingUnitItems {
+    Product: any;
     EWMStockQuantityInBaseUnit_1: number;
     HandlingUnitBottomInd: any;
     HandlingUnitTopLevelInd: any;

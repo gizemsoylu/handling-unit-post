@@ -89,7 +89,7 @@
         },
         "csrf": {
           "method": "get",
-          "url": "https://my410467-api.s4hana.cloud.sap/sap/opu/odata4/sap/api_warehouse_order_task_2/srvd_a2x/sap/warehouseorder/0001/WarehouseTask"
+          "url": "https://my410417-api.s4hana.cloud.sap/sap/opu/odata4/sap/api_warehouse_order_task_2/srvd_a2x/sap/warehouseorder/0001/WarehouseTask"
         }
       }
     },

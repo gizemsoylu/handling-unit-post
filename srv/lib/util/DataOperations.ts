@@ -93,6 +93,10 @@ export default class DataOperations {
                         .filter(item => item.NodeID === parentNode.nodeId)
                         .map(item => item.EWMStorageType);
     
+                    const parentProduct = nodeList
+                        .filter(item => item.NodeID === parentNode.nodeId)
+                        .map(item => item.Product);
+    
                     nodeList.push({
                         ...huItems,
                         QuantityAvailability: huItems.EWMStockQuantityInBaseUnit_1 === 0 ? 'Yes' : 'No',
@@ -106,7 +110,7 @@ export default class DataOperations {
                         QuantityPerHU: +huItems.EWMStockQuantityInBaseUnit_1 || 0,
                         EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
                         EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : "",
-                        Product: huItems.Product
+                        Product: parentStorageTypes.length ? parentProduct [0] : "",
                     });
     
                     nodeId++;
@@ -127,10 +131,8 @@ export default class DataOperations {
                 node.SubHUNumber = hasChild ? "" : node.SubHUNumber;
 
                 if (hasChild) {
-                    const allSameMaterial = childNodes.every(child => child.Product === childNodes[0].Product);
                     const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
                     const allIsCompleted = childNodes.every(child => child.EWMHUProcessStepIsCompleted === childNodes[0].EWMHUProcessStepIsCompleted);
-                    node.Product = allSameMaterial ? childNodes[0].Product : "Multiple Materials";
                     node.HUStatus = allSameStatus ? childNodes[0].HUStatus : "";
                     node.EWMHUProcessStepIsCompleted = allIsCompleted ? childNodes[0].EWMHUProcessStepIsCompleted : false;
                 }

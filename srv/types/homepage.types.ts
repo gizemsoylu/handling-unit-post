@@ -28,7 +28,8 @@ export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
 }
 
 export interface IHandlingUnitItems {
-    Product: any;
+    HandlingUnitIndicator: string;
+    Product: string;
     EWMStockQuantityInBaseUnit_1: number;
     HandlingUnitBottomInd: any;
     HandlingUnitTopLevelInd: any;

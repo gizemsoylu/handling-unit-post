@@ -17,12 +17,14 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     let nodeList: IHandlingUnitsArray = [];
     let nodeId = 1;
 
+    huPallets = huPallets.filter((huItems: IHandlingUnitItems) => huItems.HandlingUnitIndicator !== 'A');
+
     huPallets.forEach((huItems: IHandlingUnitItems) => {
         huItems = dataOperations.formatHUItems(huItems);
     });
 
     huPallets.forEach(huItems => {
-        const result = dataOperations.handleParentNode(huItems, parentNodeMap, nodeList, nodeId);
+        const result = dataOperations.handleParentNode(parentNodeMap, huItems, nodeList, nodeId);
         nodeList = result.nodeList;
         nodeId = result.nodeId;
     });

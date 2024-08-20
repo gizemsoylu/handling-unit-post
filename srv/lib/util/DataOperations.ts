@@ -33,8 +33,8 @@ export default class DataOperations {
     }
 
     public handleParentNode(
-        huItems: IHandlingUnitItems,
         parentNodeMap: Map<string, { nodeId: number, subNodes: string[] }>,
+        huItems: IHandlingUnitItems,
         nodeList: IHandlingUnitsArray,
         nodeId: number
     ): { nodeList: IHandlingUnitsArray, nodeId: number } {
@@ -58,7 +58,6 @@ export default class DataOperations {
                     QuantityPerHU: +huItems.AvailableEWMStockQty,
                     EWMStorageBin: huItems.EWMStorageBin_1,
                     EWMStorageType: huItems.EWMStorageType_1,
-                    Product: huItems.Product,
                 });
 
                 nodeId++;
@@ -131,8 +130,10 @@ export default class DataOperations {
                 node.SubHUNumber = hasChild ? "" : node.SubHUNumber;
 
                 if (hasChild) {
+                    const allSameProduct = childNodes.every(child => child.Product === childNodes[0].Product);
                     const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
                     const allIsCompleted = childNodes.every(child => child.EWMHUProcessStepIsCompleted === childNodes[0].EWMHUProcessStepIsCompleted);
+                    node.Product = allSameProduct ? childNodes[0].Product : "Multiple Product";
                     node.HUStatus = allSameStatus ? childNodes[0].HUStatus : "";
                     node.EWMHUProcessStepIsCompleted = allIsCompleted ? childNodes[0].EWMHUProcessStepIsCompleted : false;
                 }

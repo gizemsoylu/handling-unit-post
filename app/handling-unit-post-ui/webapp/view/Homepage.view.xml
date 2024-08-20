@@ -80,7 +80,7 @@
                         selectionMode="MultiToggle"
                         rowSelectionChange="onHUSelectionChange"
                         enableSelectAll="false"
-                        threshold="18"
+                        threshold="16"
                     >
                         <table:rowSettingsTemplate>
                             <table:RowSettings
@@ -88,7 +88,7 @@
                             />
                         </table:rowSettingsTemplate>
                         <table:rowMode>
-                            <rowmodes:Fixed rowCount="18"/>
+                            <rowmodes:Interactive rowCount="16"/>
                         </table:rowMode>
                         <table:columns>
                             <table:Column width="8rem">

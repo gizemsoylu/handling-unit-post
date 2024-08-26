@@ -54,7 +54,7 @@
                     header="{i18n>handlingUnit}"
                     showRowCount="false"
                     enableCopy="false"
-                    enableExport="false"
+                    enableExport="true"
                     enableAutoBinding="false"
                     editTogglable="false"
                     app:useSmartToggle="false"

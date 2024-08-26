@@ -194,12 +194,12 @@ const getStorageTypes: OnEventHandler = async function (req: TypedRequest<{ EWMS
 
 const getProductionOrders: OnEventHandler = async function (req: TypedRequest<{ ProductionOrder: string }[]>): Promise<{ ProductionOrder: string }[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allOrders = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('ProductionOrder'));
+    const allOrders = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('ProductionOrder_1'));
     let uniqueOrders: { ProductionOrder: string }[] = [];
 
-    allOrders.forEach((item: { ProductionOrder: string; }) => {
-        if (item.ProductionOrder !== '' && !uniqueOrders.some(warehouse => warehouse.ProductionOrder === item.ProductionOrder)) {
-            uniqueOrders.push({ ProductionOrder: item.ProductionOrder });
+    allOrders.forEach((item: { ProductionOrder_1: string; }) => {
+        if (item.ProductionOrder_1 !== '' && !uniqueOrders.some(warehouse => warehouse.ProductionOrder === item.ProductionOrder_1)) {
+            uniqueOrders.push({ ProductionOrder: item.ProductionOrder_1 });
         }
     });
 

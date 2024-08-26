@@ -49,7 +49,6 @@ export default class DataOperations {
                 nodeList.push({
                     ...huItems,
                     QuantityAvailability: huItems.AvailableEWMStockQty === 0 ? 'Yes' : 'No',
-                    ProductionOrder: "",
                     PackagingMaterial: huItems.PackagingMaterialType,
                     NodeID: nodeId,
                     HierarchyLevel: 0,
@@ -58,6 +57,7 @@ export default class DataOperations {
                     QuantityPerHU: +huItems.AvailableEWMStockQty,
                     EWMStorageBin: huItems.EWMStorageBin_1,
                     EWMStorageType: huItems.EWMStorageType_1,
+                    ProductionOrder: huItems.ProductionOrder_1,
                 });
 
                 nodeId++;
@@ -110,6 +110,8 @@ export default class DataOperations {
                         EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
                         EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : "",
                         Product: parentStorageTypes.length ? parentProduct [0] : "",
+                        ProductionOrder: huItems.ProductionOrder_1 || "",
+
                     });
     
                     nodeId++;
@@ -132,8 +134,10 @@ export default class DataOperations {
                 if (hasChild) {
                     const allSameProduct = childNodes.every(child => child.Product === childNodes[0].Product);
                     const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
+                    const allSameProductionOrder = childNodes.every(child => child.ProductionOrder_1 === childNodes[0].ProductionOrder_1);
                     const allIsCompleted = childNodes.every(child => child.EWMHUProcessStepIsCompleted === childNodes[0].EWMHUProcessStepIsCompleted);
                     node.Product = allSameProduct ? childNodes[0].Product : "Multiple Product";
+                    node.Product = allSameProductionOrder ? childNodes[0].ProductionOrder_1 : "Multiple Production Order";
                     node.HUStatus = allSameStatus ? childNodes[0].HUStatus : "";
                     node.EWMHUProcessStepIsCompleted = allIsCompleted ? childNodes[0].EWMHUProcessStepIsCompleted : false;
                 }

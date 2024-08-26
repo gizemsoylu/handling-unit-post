@@ -1,4 +1,5 @@
 export interface IHandlingUnits {
+    ProductionOrder_1: string;
     Product: string;
     NodeID: number
     HierarchyLevel: number;
@@ -28,6 +29,7 @@ export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
 }
 
 export interface IHandlingUnitItems {
+    ProductionOrder_1: string;
     HandlingUnitIndicator: string;
     Product: string;
     EWMStockQuantityInBaseUnit_1: number;

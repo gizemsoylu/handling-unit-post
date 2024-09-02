@@ -3,7 +3,7 @@ import {
     getHandlingUnits, getStorageBins, getEWMWarehouseBins,
     getHandlingUnitStatus, moveHandlingUnits, getHandlingUnitEWMHouses,
     getHandlingUnitNumbers, getProducts, getProductionOrders,
-    getVHStorageBins, getStorageTypes, getAvailabilityQuantity
+    getVHStorageBins, getStorageTypes
 } from "./lib/event-handlers/homepage";
 
 export default class HandlingUnitPost extends ApplicationService {
@@ -20,7 +20,6 @@ export default class HandlingUnitPost extends ApplicationService {
         this.on("READ", "VHProducts", getProducts);
         this.on("READ", "VHStorageBins", getVHStorageBins);
         this.on("READ", "VHStorageTypes", getStorageTypes);
-        this.on("READ", "VHAvailabilityQuantity", getAvailabilityQuantity);
 
         this.on("CREATE", "StorageBins", moveHandlingUnits);
         this.on("READ", "HandlingUnits", getHandlingUnits);

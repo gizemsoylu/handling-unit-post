@@ -106,14 +106,7 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
 /* ======================================================================================================================= */
 
 const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitStatus: string }[]>): Promise<{ HUStatus: string }[]> {
-    const DataOperation = new DataOperations()
-    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
-    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm).columns('HandlingUnitStatus'));
-    const uniqueStatuses = [...new Set<string>(huPallets.map((item: { HandlingUnitStatus: string; }) => item.HandlingUnitStatus))];
-    const formattedStatuses = uniqueStatuses.map(status => ({ HUStatus: DataOperation.convertStatus(status) }));
-
-    return formattedStatuses;
+    return [{HUStatus:"Planned"}, {HUStatus:"Received"}];
 }
 
 const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedRequest<{ EWMWarehouse: string }[]>): Promise<{ EWMWarehouse: string }[]> {
@@ -206,24 +199,6 @@ const getProductionOrders: OnEventHandler = async function (req: TypedRequest<{ 
     return uniqueOrders;
 }
 
-const getAvailabilityQuantity: OnEventHandler = async function (req: TypedRequest<{ AvailableEWMStockQty: string }[]>): Promise<{ QuantityAvailability: string }[]> {
-    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allQuantities = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('AvailableEWMStockQty'));
-    let uniqueQuantities: { QuantityAvailability: string }[] = [];
-    let quantityAvailabilitySet = new Set<string>();
-
-    allQuantities.forEach((item: { AvailableEWMStockQty: string }) => {
-        let quantityAvailability = parseFloat(item.AvailableEWMStockQty) === 0 ? 'Yes' : 'No';
-
-        if (!quantityAvailabilitySet.has(quantityAvailability)) {
-            quantityAvailabilitySet.add(quantityAvailability);
-            uniqueQuantities.push({ QuantityAvailability: quantityAvailability });
-        }
-    });
-
-    return uniqueQuantities;
-};
-
 const getEWMWarehouseBins: OnEventHandler = async function (req: TypedRequest<{ EWMWarehouse: string }>): Promise<IStorageBins[]> {
     const EWMWarehouse = req.data.EWMWarehouse;
     const storageService = await connect.to("WAREHOUSESTORAGEBIN");
@@ -258,7 +233,6 @@ export {
     getHandlingUnitEWMHouses,
     getHandlingUnitNumbers,
     getProductionOrders,
-    getAvailabilityQuantity,
     getVHStorageBins,
     getStorageTypes,
     getProducts

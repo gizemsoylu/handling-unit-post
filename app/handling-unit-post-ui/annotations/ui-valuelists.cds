@@ -76,19 +76,6 @@ annotate service.HandlingUnits {
             ValueListProperty: 'ProductionOrder'
         }]
     };
-
-    @Common.FilterDefaultValue      : 'Yes'
-    @Common.ValueListWithFixedValues: true
-    QuantityAvailability @Common.ValueList: {
-        $Type         : 'Common.ValueListType',
-        CollectionPath: 'VHAvailabilityQuantity',
-        SearchSupported,
-        Parameters    : [{
-            $Type            : 'Common.ValueListParameterInOut',
-            LocalDataProperty: QuantityAvailability,
-            ValueListProperty: 'QuantityAvailability'
-        }]
-    };
 }
 
 annotate service.StorageBins {

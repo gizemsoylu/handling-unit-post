@@ -19,7 +19,7 @@ entity HandlingUnits {
         EWMWarehouse                : String;
         EWMHUProcessStepIsCompleted : Boolean;
         EWMDimensionUnit            : String;
-        CreationDate                : DateTime;
+        CreationDate                : Date;
 }
 
 @cds.persistence.skip

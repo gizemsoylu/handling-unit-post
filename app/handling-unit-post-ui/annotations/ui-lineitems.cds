@@ -16,8 +16,8 @@ annotate service.HandlingUnits with @(UI: {
         EWMStorageBin,
         EWMStorageType,
         ProductionOrder,
-        HUStatus, 
-        QuantityAvailability
+        CreationDate,
+        HUStatus
     ],
 
     LineItem       : [
@@ -83,14 +83,6 @@ annotate service.HandlingUnits with @(UI: {
             ![@HTML5.CssDefaults]: {
                 $Type: 'HTML5.CssDefaultsType',
                 width: '8rem',
-            },
-        },
-        {
-            $Type                : 'UI.DataField',
-            Value                : EWMHUProcessStepIsCompleted,
-            ![@HTML5.CssDefaults]: {
-                $Type: 'HTML5.CssDefaultsType',
-                width: '6rem',
             },
         }
     ],

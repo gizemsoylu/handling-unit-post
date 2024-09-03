@@ -85,6 +85,9 @@ export interface IMoveHUBody {
     moveHUs: IMoveStorageBins[]
 }
 export interface IWhereClause {
+    xpr: (string | IWhereClause)[];
+    args: any;
+    func: string;
     ref: string[];
     val: number | string | Date | null;
 }

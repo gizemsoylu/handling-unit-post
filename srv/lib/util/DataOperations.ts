@@ -6,7 +6,6 @@ export default class DataOperations {
         huItems.HUNumber = huItems.HandlingUnitNumber.replace(/^0+/, '');
         huItems.SubHUNumber = huItems.HandlingUnitNumber !== huItems.HandlingUnitNumber_1 ? huItems.HandlingUnitNumber_1.replace(/^0+/, '') : "";
         huItems.HUType = huItems.HandlingUnitType;
-        huItems.HUStatus = +huItems.AvailableEWMStockQty > 0 ? 'Received' : 'Planned' ;
         huItems.SubEWMWarehouse = huItems.EWMWarehouse_1;
         huItems.EWMWarehouse = huItems.EWMWarehouse;
         huItems.CreationDate = huItems.CreationDateTime || null;
@@ -15,7 +14,8 @@ export default class DataOperations {
         huItems.PackagingMaterialType = huItems.PackagingMaterialType || '';
         huItems.PackagingMaterialType = huItems.PackagingMaterialType || '';
         huItems.HandlingUnitTopLevelInd = huItems.HandlingUnitTopLevelInd || '',
-        huItems.HandlingUnitBottomInd = huItems.HandlingUnitBottomInd || ''
+        huItems.HandlingUnitBottomInd = huItems.HandlingUnitBottomInd || '',
+        huItems.ProductionOrder = huItems.ProductionOrder
         return huItems;
     }
 
@@ -44,6 +44,8 @@ export default class DataOperations {
                     EWMStorageBin: huItems.EWMStorageBin_1,
                     EWMStorageType: huItems.EWMStorageType_1,
                     ProductionOrder: huItems.ProductionOrder,
+                    Product:  +huItems.AvailableEWMStockQty > 0 ? huItems.Product : huItems.MaterialNumber,
+                    HUStatus:  +huItems.AvailableEWMStockQty > 0 ? 'Received' : 'Planned' 
                 });
 
                 nodeId++;
@@ -77,6 +79,10 @@ export default class DataOperations {
                     const parentStorageTypes = nodeList
                         .filter(item => item.NodeID === parentNode.nodeId)
                         .map(item => item.EWMStorageType);
+
+                    const parentProductionOrder = nodeList
+                        .filter(item => item.NodeID === parentNode.nodeId)
+                        .map(item => item.ProductionOrder);
     
                     const parentProduct = nodeList
                         .filter(item => item.NodeID === parentNode.nodeId)
@@ -85,6 +91,16 @@ export default class DataOperations {
                                 return item.Product;
                             } else {
                                 return item.MaterialNumber;
+                            }
+                        });
+
+                    const parentStatus = nodeList
+                        .filter(item => item.NodeID === parentNode.nodeId)
+                        .map(item => {
+                            if (+item.AvailableEWMStockQty > 0) {
+                                return 'Received';
+                            } else {
+                                return 'Planned';
                             }
                         });
     
@@ -101,7 +117,8 @@ export default class DataOperations {
                         EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
                         EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : "",
                         Product: parentProduct.length ? parentProduct[0] : "",
-                        ProductionOrder: huItems.ProductionOrder || "",
+                        ProductionOrder: parentProductionOrder.length ? parentProductionOrder[0] : "",
+                        HUStatus: parentStatus.length ? parentStatus[0] : ""
                     });
     
                     nodeId++;
@@ -124,12 +141,10 @@ export default class DataOperations {
                 if (hasChild) {
                     const allSameProduct = childNodes.every(child => child.Product === childNodes[0].Product);
                     const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
-                    const allSameProductionOrder = childNodes.every(child => child.ProductionOrder === childNodes[0].ProductionOrder);
-                    const allIsCompleted = childNodes.every(child => child.EWMHUProcessStepIsCompleted === childNodes[0].EWMHUProcessStepIsCompleted);
+                    // const allSameProductionOrder = childNodes.every(child => child.ProductionOrder === childNodes[0].ProductionOrder);
                     node.Product = allSameProduct ? childNodes[0].Product : "Multiple Product";
-                    node.ProductionOrder = allSameProductionOrder ? childNodes[0].ProductionOrder : "Multiple Production Order";
+                    // node.ProductionOrder = allSameProductionOrder ? childNodes[0].ProductionOrder : "Multiple Production Order";
                     node.HUStatus = allSameStatus ? childNodes[0].HUStatus : "";
-                    node.EWMHUProcessStepIsCompleted = allIsCompleted ? childNodes[0].EWMHUProcessStepIsCompleted : false;
                 }
             }
         });

@@ -16,7 +16,6 @@ annotate service.HandlingUnits with @(UI: {
         EWMStorageBin,
         EWMStorageType,
         ProductionOrder,
-        CreationDate,
         HUStatus
     ],
 

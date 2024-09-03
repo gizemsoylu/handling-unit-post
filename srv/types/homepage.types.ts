@@ -1,4 +1,5 @@
 export interface IHandlingUnits {
+    EWMStockQuantityInBaseUnit_1: any;
     MaterialNumber?: string;
     Product?: string;
     NodeID: number
@@ -29,6 +30,8 @@ export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
 }
 
 export interface IHandlingUnitItems {
+    YY1_PlannedMaterial_HUH: string | undefined;
+    MaterialNumber?: string | undefined;
     ProductionOrder: string;
     HandlingUnitIndicator: string;
     Product: string;

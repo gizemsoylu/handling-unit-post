@@ -8,12 +8,12 @@ export default class FilterOperations {
             let currentOperator = '';
             let currentValue: any = null;
             let isMatching = true;
-    
+        
             for (const filter of filters) {
                 if (typeof filter === 'string') {
                     if (filter === 'and') {
                         if (!isMatching) return false;
-                        isMatching = true;
+                        isMatching = true;  
                     } else {
                         currentOperator = filter;
                     }
@@ -24,23 +24,57 @@ export default class FilterOperations {
     
                     if (filter.hasOwnProperty('val')) {
                         currentValue = filter.val;
-                        isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
+                        if (isMatching) {
+                            isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
+                        }
+                    } else if (filter.hasOwnProperty('xpr')) {
+                        isMatching = this.processXpr(node, filter.xpr);
                     } else if (filter.hasOwnProperty('func')) {
                         currentOperator = filter.func;
                         const args = filter.args;
                         
                         if (args && args.length > 0) {
-                            currentField = args[0].ref[0]; // Update currentField based on the args[0].ref[0]
-                            currentValue = args.length > 1 ? args[1].val : null; // If there's a second arg, it's the value to use
+                            currentField = args[0].ref[0];
+                            currentValue = args.length > 1 ? args[1].val : null;
                         }
-                        
-                        isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
+    
+                        if (isMatching) {
+                            isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
+                        }
                     }
                 }
             }
             return isMatching;
         });
-    }    
+    }
+
+    private processXpr(node: any, xpr: any[]): boolean {
+        let isMatching = false;
+        let currentField = '';
+        let currentOperator = '';
+        let currentValue: any = null;
+    
+        for (let i = 0; i < xpr.length; i++) {
+            const part = xpr[i];
+    
+            if (typeof part === 'string') {
+                if (part === 'or') {
+                    if (isMatching) return true;
+                } else if (part === 'and') {
+                    if (!isMatching) return false;
+                } else {
+                    currentOperator = part;
+                }
+            } else if (part.hasOwnProperty('ref')) {
+                currentField = part.ref[0];
+            } else if (part.hasOwnProperty('val')) {
+                currentValue = part.val;
+                isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
+            }
+        }
+    
+        return isMatching;
+    }
     
     private applyFilter(node: any, field: string, operator: string, value: any): boolean {
         switch (operator) {

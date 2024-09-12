@@ -28,13 +28,13 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         nodeList = result.nodeList;
         nodeId = result.nodeId;
     });
-    
+
     huPallets.forEach(huItems => {
         const result = dataOperations.handleChildNodes(parentNodeMap, huItems, nodeList, nodeId);
         nodeList = result.nodeList;
         nodeId = result.nodeId;
     });
-    
+
     nodeList = dataOperations.updateNodeList(nodeList);
 
     if (req.query.SELECT?.where) {
@@ -106,7 +106,7 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
 /* ======================================================================================================================= */
 
 const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitStatus: string }[]>): Promise<{ HUStatus: string }[]> {
-    return [{HUStatus:"Planned"}, {HUStatus:"Received"}];
+    return [{ HUStatus: "Planned" }, { HUStatus: "Received" }];
 }
 
 const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedRequest<{ EWMWarehouse: string }[]>): Promise<{ EWMWarehouse: string }[]> {
@@ -138,8 +138,19 @@ const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest
         }
     });
 
+    if (req.query.SELECT?.search) {
+        const filters = req.query.SELECT.search as unknown as IWhereClause[];
+        const searchValues = filters.map(filter => filter.val as string);
+
+        uniqueHUs = uniqueHUs.filter((hu: { HUNumber: string }) =>
+            searchValues.some(searchValue => hu.HUNumber.includes(searchValue))
+        );
+    } else {
+        uniqueHUs = uniqueHUs.map(hu => ({ HUNumber: hu.HUNumber }));
+    }
+
     return uniqueHUs;
-}
+};
 
 const getProducts: OnEventHandler = async function (req: TypedRequest<{ Product: string }[]>): Promise<{ Product: string }[]> {
     const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");

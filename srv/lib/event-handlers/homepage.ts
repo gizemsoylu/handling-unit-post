@@ -60,25 +60,38 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
             const body = { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse };
             const warehouseOrderSrv = await connect.to("WAREHOUSEORDER");
 
-            try {
-                const response = await warehouseOrderSrv.send("POST", "/WarehouseTask", body);
-                return response;
-            } catch (error) {
-                if (error instanceof Error) {
-                    req.error({
-                        code: 'Create-Warehouse-Task',
-                        message: error.message,
-                        target: 'EWMStorageBin',
-                        status: 500
-                    })
-                } else {
-                    req.error({
-                        code: 'Create-Warehouse-Task',
-                        message: "Failed to move handling units due to an unexpected error. Please try again later.",
-                        target: 'EWMStorageBin',
-                        status: 500
-                    })
+            const maxRetries = 3;
+            let attempt = 0;
+            let success = false;
+            let lastErrorMessage = ""; 
+
+            while (attempt < maxRetries && !success) {
+                try {
+                    const response = await warehouseOrderSrv.send("POST", "/WarehouseTask", body);
+                    success = true;
+                    return response; 
+                } catch (error) {
+                    attempt++;
+
+                    if (error instanceof Error) {
+                        lastErrorMessage = error.message;
+
+                        if (error.message.includes("blocked") && attempt < maxRetries) {
+                            continue; 
+                        }
+                    } else {
+                        lastErrorMessage = "Unknown error has occured.Please contact with your administrator.";
+                    }
                 }
+            }
+
+            if (!success) {
+                req.error({
+                    code: 'Create-Warehouse-Task',
+                    message: lastErrorMessage, 
+                    target: 'EWMStorageBin',
+                    status: 500
+                });
             }
         }));
     } catch (error) {
@@ -88,18 +101,17 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
                 message: error.message,
                 target: 'EWMStorageBin',
                 status: 500
-            })
+            });
         } else {
             req.error({
                 code: 'Create-Warehouse-Task',
-                message: "Failed to move handling units due to an unexpected error. Please try again later.",
+                message: "Unknown error has occured.Please contact with your administrator.",
                 target: 'EWMStorageBin',
                 status: 500
-            })
+            });
         }
     }
-}
-
+};
 
 /* ======================================================================================================================= */
 /* Value Help Operations                                                                                                   */

@@ -1,19 +1,67 @@
 import { IHandlingUnitsArray, IOrderByClause, IWhereClause } from "../../types/homepage.types";
 
 export default class FilterOperations {
-
     public filterNodeList(nodeList: IHandlingUnitsArray, filters: (IWhereClause | string)[]): IHandlingUnitsArray {
+        let hasParentNodeID = false;
+
+        filters.forEach(filter => {
+            if (this.isIWhereClause(filter) && filter.ref && filter.ref[0] === 'ParentNodeID') {
+                hasParentNodeID = true;
+            }
+        });
+
+        if (hasParentNodeID) {
+            let skipNext = false;  
+            filters = filters.reduce((acc, filter, index) => {
+                if (skipNext) {
+                    if (this.isIWhereClause(filter) && filter.hasOwnProperty('val')) {
+                        skipNext = false;
+                    }
+                    return acc;  
+                }
+        
+                if (this.isIWhereClause(filter) && filter.hasOwnProperty('ref') && Array.isArray(filter.ref) && filter.ref[0] === 'HUNumber') {
+                    skipNext = true;  
+                    return acc;  
+                }
+        
+                if (
+                    index > 0 && 
+                    typeof filters[index - 1] === 'string' && 
+                    ['and', 'or', '='].includes(filters[index - 1] as string)
+                ) {
+                    if (this.isIWhereClause(filters[index]) && filters[index].hasOwnProperty('ref') && filters[index].ref[0] === 'HUNumber') {
+                        skipNext = true;  
+                        acc.pop();  
+                        return acc;  
+                    }
+                }
+        
+                if (this.isIWhereClause(filter) && filter.hasOwnProperty('xpr')) {
+                    if (index > 0 && typeof filters[index - 1] === 'string' && ['and', 'or'].includes(filters[index - 1] as string)) {
+                        acc.pop();  
+                    }
+                    return acc;  
+                }
+        
+                return [...acc, filter];  
+            }, [] as (IWhereClause | string)[]);
+        }
+
         return nodeList.filter(node => {
             let currentField = '';
             let currentOperator = '';
             let currentValue: any = null;
             let isMatching = true;
-        
+
             for (const filter of filters) {
                 if (typeof filter === 'string') {
                     if (filter === 'and') {
                         if (!isMatching) return false;
-                        isMatching = true;  
+                        isMatching = true;
+                    } else if (filter === 'or') {
+                        if (isMatching) return true;
+                        isMatching = false;
                     } else {
                         currentOperator = filter;
                     }
@@ -21,7 +69,7 @@ export default class FilterOperations {
                     if (filter.hasOwnProperty('ref')) {
                         currentField = filter.ref[0];
                     }
-    
+
                     if (filter.hasOwnProperty('val')) {
                         currentValue = filter.val;
                         if (isMatching) {
@@ -29,18 +77,6 @@ export default class FilterOperations {
                         }
                     } else if (filter.hasOwnProperty('xpr')) {
                         isMatching = this.processXpr(node, filter.xpr);
-                    } else if (filter.hasOwnProperty('func')) {
-                        currentOperator = filter.func;
-                        const args = filter.args;
-                        
-                        if (args && args.length > 0) {
-                            currentField = args[0].ref[0];
-                            currentValue = args.length > 1 ? args[1].val : null;
-                        }
-    
-                        if (isMatching) {
-                            isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
-                        }
                     }
                 }
             }
@@ -48,15 +84,27 @@ export default class FilterOperations {
         });
     }
 
+    private isIWhereClause(filter: any): filter is IWhereClause {
+        return (
+            typeof filter === 'object' &&
+            filter !== null &&
+            (
+                (filter.hasOwnProperty('ref') && Array.isArray(filter.ref)) || 
+                filter.hasOwnProperty('xpr') 
+            )
+        );
+    }
+    
+    
     private processXpr(node: any, xpr: any[]): boolean {
         let isMatching = false;
         let currentField = '';
         let currentOperator = '';
         let currentValue: any = null;
-    
+
         for (let i = 0; i < xpr.length; i++) {
             const part = xpr[i];
-    
+
             if (typeof part === 'string') {
                 if (part === 'or') {
                     if (isMatching) return true;
@@ -70,12 +118,14 @@ export default class FilterOperations {
             } else if (part.hasOwnProperty('val')) {
                 currentValue = part.val;
                 isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
+            } else if (part.hasOwnProperty('xpr')) {
+                isMatching = this.processXpr(node, part.xpr);
             }
         }
-    
+
         return isMatching;
     }
-    
+
     private applyFilter(node: any, field: string, operator: string, value: any): boolean {
         switch (operator) {
             case '=':
@@ -115,7 +165,7 @@ export default class FilterOperations {
                 return true;
         }
     }
-    
+
     public sortNodes(nodeList: IHandlingUnitsArray, orderBy: IOrderByClause[]): IHandlingUnitsArray {
         const sortedNodes = [...nodeList];
         orderBy.reverse().forEach(order => {

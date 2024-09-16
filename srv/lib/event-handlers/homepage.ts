@@ -138,30 +138,37 @@ const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedReque
 }
 
 const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitNumber: string }[]>): Promise<{ HUNumber: string }[]> {
-    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const allHUs = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('HandlingUnitNumber').where({
-        PackagingMaterialType: ['Z001', 'Z002']
-    }));
-    let uniqueHUs: { HUNumber: string }[] = [];
+    try {
+        const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+        const allHUs = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('HandlingUnitNumber').where({
+            PackagingMaterialType: ['Z001', 'Z002']
+        }));
+        let uniqueHUs: { HUNumber: string }[] = [];
 
-    allHUs.forEach((item: { HandlingUnitNumber: string; }) => {
-        if (item.HandlingUnitNumber !== '' && !uniqueHUs.some(warehouse => warehouse.HUNumber === item.HandlingUnitNumber)) {
-            uniqueHUs.push({ HUNumber: item.HandlingUnitNumber.replace(/^0+/, '') });
+        allHUs.forEach((item: { HandlingUnitNumber: string }) => {
+            if (item.HandlingUnitNumber !== '' && !uniqueHUs.some(hu => hu.HUNumber === item.HandlingUnitNumber)) {
+                uniqueHUs.push({ HUNumber: item.HandlingUnitNumber.replace(/^0+/, '') });
+            }
+        });
+
+        if ((req.query.SELECT as any)?.search) {
+            const filters = (req.query.SELECT as any).search as IWhereClause[];
+            const searchValues = filters.map(filter => filter.val as string);
+
+            uniqueHUs = uniqueHUs.filter((hu: { HUNumber: string }) =>
+                searchValues.some(searchValue => hu.HUNumber.includes(searchValue))
+            );
+        } else {
+            // Eğer search parametresi yoksa, HUNumber'ları sadece formatla
+            uniqueHUs = uniqueHUs.map(hu => ({ HUNumber: hu.HUNumber }));
         }
-    });
 
-    if (req.query.SELECT?.search) {
-        const filters = req.query.SELECT.search as unknown as IWhereClause[];
-        const searchValues = filters.map(filter => filter.val as string);
+        return uniqueHUs;
 
-        uniqueHUs = uniqueHUs.filter((hu: { HUNumber: string }) =>
-            searchValues.some(searchValue => hu.HUNumber.includes(searchValue))
-        );
-    } else {
-        uniqueHUs = uniqueHUs.map(hu => ({ HUNumber: hu.HUNumber }));
+    } catch (error) {
+        console.error("Error in getHandlingUnitNumbers: ", error);
+        throw new Error("Failed to fetch handling unit numbers");
     }
-
-    return uniqueHUs;
 };
 
 const getProducts: OnEventHandler = async function (req: TypedRequest<{ Product: string }[]>): Promise<{ Product: string }[]> {

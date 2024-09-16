@@ -90,11 +90,22 @@ export interface IWhereClause {
     func: string;
     ref: string[];
     val: number | string | Date | null;
+    search:string;
 }
 
 export interface IOrderByClause {
     [x: string]: any;
     ref: string[];
     sort: 'asc' | 'desc';
+}
+
+interface ISelect {
+    search?: IWhereClause[]; 
+}
+
+interface TypedRequest<T> extends Request {
+    query: {
+        SELECT?: ISelect; 
+    };
 }
 

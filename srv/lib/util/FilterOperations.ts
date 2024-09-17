@@ -87,13 +87,11 @@ export default class FilterOperations {
         if (filteredNodes.length === 0) {
             let HUNumber: any = null;
 
-            // Iterate through filters to find HUNumber and then get the next val
             filters.forEach((filter, index) => {
                 if (this.isIWhereClause(filter) && filter.ref[0] === 'HUNumber') {
-                    // Ensure index + 2 is within bounds and check if it's an IWhereClause with a 'val' property
                     const nextFilter = filters[index + 2];
                     if (nextFilter && typeof nextFilter === 'object' && 'val' in nextFilter) {
-                        HUNumber = nextFilter?.val; // Assign the HUNumber's val directly
+                        HUNumber = nextFilter?.val; 
                     }
                 }
             });
@@ -101,14 +99,10 @@ export default class FilterOperations {
             if (HUNumber) {
                 filteredNodes = nodeList.filter(node => node.HUNumber === HUNumber);
 
-                // Step 4: If HUNumber is found, get ParentNodeID and filter nodeList by NodeID
                 if (filteredNodes.length > 0) {
-                    const parentNodeID = filteredNodes[0].ParentNodeID; // Get the ParentNodeID
-
-                    // Filter by NodeID matching the ParentNodeID
+                    const parentNodeID = filteredNodes[0].ParentNodeID; 
                     const parentNodes = nodeList.filter(node => node.NodeID === parentNodeID);
 
-                    // Combine the filtered nodes (children) with the parent node
                     filteredNodes = [...parentNodes];
                 }
             }

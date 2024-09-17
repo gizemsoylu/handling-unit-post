@@ -4,7 +4,6 @@ export default class FilterOperations {
     public filterNodeList(nodeList: IHandlingUnitsArray, filters: (IWhereClause | string)[]): IHandlingUnitsArray {
         let hasParentNodeID = false;
 
-        // Step 1: Check if ParentNodeID exists in filters
         filters.forEach(filter => {
             if (this.isIWhereClause(filter) && filter.ref && filter.ref[0] === 'ParentNodeID') {
                 hasParentNodeID = true;

@@ -59,24 +59,19 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
             const { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse } = item;
             const body = { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse };
             const warehouseOrderSrv = await connect.to("WAREHOUSEORDER");
-
-            const maxRetries = 3;
-            let attempt = 0;
             let success = false;
             let lastErrorMessage = ""; 
 
-            while (attempt < maxRetries && !success) {
+            while (!success) {
                 try {
                     const response = await warehouseOrderSrv.send("POST", "/WarehouseTask", body);
                     success = true;
                     return response; 
                 } catch (error) {
-                    attempt++;
-
                     if (error instanceof Error) {
                         lastErrorMessage = error.message;
 
-                        if (error.message.includes("blocked") && attempt < maxRetries) {
+                        if (error.message.includes("already being processed by user")) {
                             continue; 
                         }
                     } else {

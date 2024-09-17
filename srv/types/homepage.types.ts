@@ -90,7 +90,7 @@ export interface IWhereClause {
     func: string;
     ref: string[];
     val: number | string | Date | null;
-    search:string;
+    search?:string;
 }
 
 export interface IOrderByClause {

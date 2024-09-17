@@ -4,6 +4,7 @@ export default class FilterOperations {
     public filterNodeList(nodeList: IHandlingUnitsArray, filters: (IWhereClause | string)[]): IHandlingUnitsArray {
         let hasParentNodeID = false;
 
+        // Step 1: Check if ParentNodeID exists in filters
         filters.forEach(filter => {
             if (this.isIWhereClause(filter) && filter.ref && filter.ref[0] === 'ParentNodeID') {
                 hasParentNodeID = true;
@@ -11,44 +12,44 @@ export default class FilterOperations {
         });
 
         if (hasParentNodeID) {
-            let skipNext = false;  
+            let skipNext = false;
             filters = filters.reduce((acc, filter, index) => {
                 if (skipNext) {
                     if (this.isIWhereClause(filter) && filter.hasOwnProperty('val')) {
                         skipNext = false;
                     }
-                    return acc;  
+                    return acc;
                 }
-        
+
                 if (this.isIWhereClause(filter) && filter.hasOwnProperty('ref') && Array.isArray(filter.ref) && filter.ref[0] === 'HUNumber') {
-                    skipNext = true;  
-                    return acc;  
+                    skipNext = true;
+                    return acc;
                 }
-        
+
                 if (
-                    index > 0 && 
-                    typeof filters[index - 1] === 'string' && 
+                    index > 0 &&
+                    typeof filters[index - 1] === 'string' &&
                     ['and', 'or', '='].includes(filters[index - 1] as string)
                 ) {
                     if (this.isIWhereClause(filters[index]) && filters[index].hasOwnProperty('ref') && filters[index].ref[0] === 'HUNumber') {
-                        skipNext = true;  
-                        acc.pop();  
-                        return acc;  
+                        skipNext = true;
+                        acc.pop();
+                        return acc;
                     }
                 }
-        
+
                 if (this.isIWhereClause(filter) && filter.hasOwnProperty('xpr')) {
                     if (index > 0 && typeof filters[index - 1] === 'string' && ['and', 'or'].includes(filters[index - 1] as string)) {
-                        acc.pop();  
+                        acc.pop();
                     }
-                    return acc;  
+                    return acc;
                 }
-        
-                return [...acc, filter];  
+
+                return [...acc, filter];
             }, [] as (IWhereClause | string)[]);
         }
 
-        return nodeList.filter(node => {
+        let filteredNodes = nodeList.filter(node => {
             let currentField = '';
             let currentOperator = '';
             let currentValue: any = null;
@@ -82,20 +83,53 @@ export default class FilterOperations {
             }
             return isMatching;
         });
+
+        if (filteredNodes.length === 0) {
+            let HUNumber: any = null;
+
+            // Iterate through filters to find HUNumber and then get the next val
+            filters.forEach((filter, index) => {
+                if (this.isIWhereClause(filter) && filter.ref[0] === 'HUNumber') {
+                    // Ensure index + 2 is within bounds and check if it's an IWhereClause with a 'val' property
+                    const nextFilter = filters[index + 2];
+                    if (nextFilter && typeof nextFilter === 'object' && 'val' in nextFilter) {
+                        HUNumber = nextFilter?.val; // Assign the HUNumber's val directly
+                    }
+                }
+            });
+
+            if (HUNumber) {
+                filteredNodes = nodeList.filter(node => node.HUNumber === HUNumber);
+
+                // Step 4: If HUNumber is found, get ParentNodeID and filter nodeList by NodeID
+                if (filteredNodes.length > 0) {
+                    const parentNodeID = filteredNodes[0].ParentNodeID; // Get the ParentNodeID
+
+                    // Filter by NodeID matching the ParentNodeID
+                    const parentNodes = nodeList.filter(node => node.NodeID === parentNodeID);
+
+                    // Combine the filtered nodes (children) with the parent node
+                    filteredNodes = [...parentNodes];
+                }
+            }
+        }
+
+        return filteredNodes;
     }
+
 
     private isIWhereClause(filter: any): filter is IWhereClause {
         return (
             typeof filter === 'object' &&
             filter !== null &&
             (
-                (filter.hasOwnProperty('ref') && Array.isArray(filter.ref)) || 
-                filter.hasOwnProperty('xpr') 
+                (filter.hasOwnProperty('ref') && Array.isArray(filter.ref)) ||
+                filter.hasOwnProperty('xpr')
             )
         );
     }
-    
-    
+
+
     private processXpr(node: any, xpr: any[]): boolean {
         let isMatching = false;
         let currentField = '';

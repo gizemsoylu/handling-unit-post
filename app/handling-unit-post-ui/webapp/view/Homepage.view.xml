@@ -65,6 +65,12 @@
                         <OverflowToolbar design="Transparent">
                             <ToolbarSpacer />
                             <Button
+                                text="{i18n>clearAll}"
+                                type="Transparent"
+                                icon="sap-icon://clear-all"
+                                press="onClearSelectedItem"
+                            />
+                            <Button
                                 text="{i18n>moveHU}"
                                 type="Emphasized"
                                 icon="sap-icon://journey-depart"

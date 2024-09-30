@@ -27,6 +27,7 @@ import MessageType from "sap/ui/core/message/MessageType";
 import { Model$RequestFailedEvent } from "sap/ui/model/Model";
 import PageCL from "../util/PageCL";
 import SmartTable from "sap/ui/comp/smarttable/SmartTable";
+import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -110,7 +111,14 @@ export default class Homepage extends BaseController {
             BusyIndicator.hide();
         }
     }
-
+    
+        public onClearSelectedItem(): void {
+            const table = this.byId("uiTreeHandlingUnit") as TreeTable
+            const selectedIndices = table.getSelectedIndices();
+            const lastIndex = selectedIndices[selectedIndices.length - 1];
+            table.removeSelectionInterval(selectedIndices[0],lastIndex);
+        }
+    
     /* ======================================================================================================================= */
     /* Internal Handlers                                                                                                       */
     /* ======================================================================================================================= */
@@ -180,13 +188,26 @@ export default class Homepage extends BaseController {
         try {
             await odata.create();
             BusyIndicator.hide();
+            const movedHUNumbers = contexts.map(context => context.HUNumber).join(", ");
             Messaging.addMessages(new Message({
-                message: this.getResourceBundleText("taskCreated"),
+                message: this.getResourceBundleText("taskCreated", [movedHUNumbers]),
                 type: MessageType.Success
             }));
-            (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);
+            (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);   
+            
+            (this.byId("stHandlingUnit") as SmartTable).attachEventOnce("dataReceived", () => {
+                table.setFirstVisibleRow(0); 
+                setTimeout(() => {
+                    const rowCount = (table.getBinding("rows") as ODataListBinding).getLength();  
+                    if (rowCount) {
+                        table.setFirstVisibleRow(rowCount - 1);
+                    }  
+                }, 1000);
+            });
+    
             this.entry.closeAndDestroyEntryDialog();
-            this.openMessagePopover();
+
+            // this.openMessagePopover();
         } catch (error: unknown) {
             BusyIndicator.hide();
             this.entry.closeAndDestroyEntryDialog();

@@ -16,6 +16,7 @@ import Messaging from "sap/ui/core/Messaging";
  */
 export default class BaseController extends Controller {
 
+    private messagePopover: FragmentCL;
 
     /* ======================================================================================================================= */
     /* Global Methods                                                                                                          */
@@ -53,14 +54,22 @@ export default class BaseController extends Controller {
     public openMessagePopover(): void {
         const view = this.getView() as View;
         (view.byId("btnMessages") as Button).firePress();
-    } 
-    
+    }
+
+    public openMessagePopoverAutoClose(): void {
+        ((this.getView() as View).byId("btnMessages") as Button).firePress();
+        setTimeout(() => {
+            this.messagePopover.closeAndDestroy();
+        }, 3000);
+    }
+
     public onMessagePopoverPress(event: Button$PressEvent): void {
-        const fragment = new FragmentCL(this, "com.ndbs.handlingunitpostui.fragments.MessagePopover", event.getSource());
-        fragment.openAsync(true);
+            this.messagePopover = new FragmentCL(this, "com.ndbs.handlingunitpostui.fragments.MessagePopover", event.getSource());
+            this.messagePopover.setAutoDestroyOnESC(true);
+            this.messagePopover.openAsync(true);  
     }
 
     public onClearMessages(): void {
         Messaging.removeAllMessages();
-    }   
+    }
 } 

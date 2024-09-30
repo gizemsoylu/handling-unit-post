@@ -19,5 +19,6 @@
             subtitle="{message>additionalText}"
             description="{message>description}"
         />
+
     </MessagePopover>
 </core:FragmentDefinition>

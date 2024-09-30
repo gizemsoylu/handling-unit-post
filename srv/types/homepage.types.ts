@@ -36,7 +36,7 @@ export interface IHandlingUnitItems {
     ProductionOrder: string;
     HandlingUnitIndicator: string;
     Product: string;
-    EWMStockQuantityInBaseUnit_1: number;
+    EWMStockQuantityInBaseUnit_1: string;
     HandlingUnitBottomInd: any;
     HandlingUnitTopLevelInd: any;
     EWMStorageBin_1: string;

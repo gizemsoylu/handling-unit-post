@@ -2,7 +2,7 @@ using HandlingUnitPost as service from '../../../srv/data-provider';
 
 annotate service.HandlingUnits {
     @Common.ValueListWithFixedValues: true
-    HUStatus             @Common.ValueList: {
+    HUStatus        @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHStatus',
         SearchSupported,
@@ -13,7 +13,7 @@ annotate service.HandlingUnits {
         }]
     };
 
-    EWMWarehouse         @Common.ValueList: {
+    EWMWarehouse    @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHWarehouses',
         SearchSupported,
@@ -24,7 +24,7 @@ annotate service.HandlingUnits {
         }]
     };
 
-    HUNumber             @Common.ValueList: {
+    HUNumber        @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHHUNumbers',
         SearchSupported,
@@ -35,7 +35,7 @@ annotate service.HandlingUnits {
         }]
     };
 
-    Product       @Common.ValueList: {
+    Product         @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHProducts',
         SearchSupported,
@@ -45,7 +45,7 @@ annotate service.HandlingUnits {
             ValueListProperty: 'Product'
         }]
     };
-    EWMStorageBin        @Common.ValueList: {
+    EWMStorageBin   @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHStorageBins',
         SearchSupported,
@@ -55,7 +55,7 @@ annotate service.HandlingUnits {
             ValueListProperty: 'EWMStorageBin'
         }]
     };
-    EWMStorageType       @Common.ValueList: {
+    EWMStorageType  @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHStorageTypes',
         SearchSupported,
@@ -66,7 +66,7 @@ annotate service.HandlingUnits {
         }]
     };
 
-    ProductionOrder      @Common.ValueList: {
+    ProductionOrder @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHOrders',
         SearchSupported,

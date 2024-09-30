@@ -141,6 +141,7 @@ export default class Homepage extends BaseController {
 
     private async onMoveHUManualSubmit(entry: EntryCreateCL) {
         BusyIndicator.show(0);
+        this.onClearMessages();
         const smartTable = this.byId("stHandlingUnit") as SmartTable;
         const path = (entry.getEntryContext() as Context).getPath();
         this.EWMStorageBin = (this.getODataModel() as ODataModel).getProperty(path).EWMStorageBin;
@@ -185,12 +186,10 @@ export default class Homepage extends BaseController {
             }));
             (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);
             this.entry.closeAndDestroyEntryDialog();
-            smartTable.rebindTable(true);
             this.openMessagePopover();
         } catch (error: unknown) {
             BusyIndicator.hide();
             this.entry.closeAndDestroyEntryDialog();
-            smartTable.rebindTable(true);
             this.openMessagePopover();
         }
 

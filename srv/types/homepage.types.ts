@@ -1,5 +1,6 @@
 export interface IHandlingUnits {
-    EWMStockQuantityInBaseUnit_1: any;
+    HandlingUnitNumber_1: string;
+    EWMStockQuantityInBaseUnit_1: string;
     MaterialNumber?: string;
     Product?: string;
     NodeID: number

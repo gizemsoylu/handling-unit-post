@@ -87,7 +87,7 @@ export default class FilterOperations {
             let HUNumber: any = null;
 
             filters.forEach((filter, index) => {
-                if (this.isIWhereClause(filter) && filter.ref[0] === 'HUNumber') {
+                if (this.isIWhereClause(filter) && Array.isArray(filter.ref) && filter.ref[0] === 'HUNumber') {
                     const nextFilter = filters[index + 2];
                     if (nextFilter && typeof nextFilter === 'object' && 'val' in nextFilter) {
                         HUNumber = nextFilter?.val; 
@@ -100,7 +100,7 @@ export default class FilterOperations {
 
                 if (filteredNodes.length > 0) {
                     const parentNodeID = filteredNodes[0].ParentNodeID; 
-                    const parentNodes = nodeList.filter(node => node.NodeID === parentNodeID);
+                    const parentNodes = nodeList.filter(node => node.NodeID === parentNodeID && node.HandlingUnitNumber_1.replace(/^0+/, '') === HUNumber);
 
                     filteredNodes = [...parentNodes];
                 }
@@ -109,7 +109,6 @@ export default class FilterOperations {
 
         return filteredNodes;
     }
-
 
     private isIWhereClause(filter: any): filter is IWhereClause {
         return (

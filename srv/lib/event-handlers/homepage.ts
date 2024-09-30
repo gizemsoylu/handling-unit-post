@@ -71,11 +71,11 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
                     if (error instanceof Error) {
                         lastErrorMessage = error.message;
 
-                        if (error.message.includes("already being processed by user")) {
+                        if (error.message.includes("already being processed by user") || error.message.includes("al bewerkt door gebruiker")) {
                             continue; 
+                        } else {
+                            break;
                         }
-                    } else {
-                        lastErrorMessage = "Unknown error has occured.Please contact with your administrator.";
                     }
                 }
             }

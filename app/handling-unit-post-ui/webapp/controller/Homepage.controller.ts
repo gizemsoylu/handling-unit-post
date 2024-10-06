@@ -28,6 +28,9 @@ import { Model$RequestFailedEvent } from "sap/ui/model/Model";
 import PageCL from "../util/PageCL";
 import SmartTable from "sap/ui/comp/smarttable/SmartTable";
 import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
+import Dialog from "sap/m/Dialog";
+import Form from "sap/ui/layout/form/Form";
+import Control from "sap/ui/core/Control";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -76,7 +79,7 @@ export default class Homepage extends BaseController {
             this.entry.setDisableAutoClose(true);
             this.entry.setFormType(FormTypes.SIMPLE);
             this.entry.registerManualSubmit(this.onMoveHUManualSubmit, this);
-            this.entry.attachSubmitFailed(this.onMoveHUSubmitFailed, this)
+            this.entry.attachSubmitFailed(this.onMoveHUSubmitFailed, this);
 
             const storageBinVH = new ValueHelpCL(this, {
                 useMetadataLabels: true,
@@ -108,17 +111,31 @@ export default class Homepage extends BaseController {
                 EWMWarehouse: this.EWMWarehouse
             });
 
+            const newEntryDialog = this.entry.getGeneratedDialog();
+            newEntryDialog.attachAfterOpen((event) => {
+                const dialog = event.getSource() as Dialog;
+                const contentAggregation = dialog.getAggregation("content") as Input;
+
+                if (contentAggregation && Array.isArray(contentAggregation) && contentAggregation.length > 0) {
+                    const input = contentAggregation[0]
+                    const formContent = input.getContent();
+
+                    if (formContent && formContent.length > 3) {
+                        (formContent[3] as Control).focus();
+                    }
+                }
+            }, this);
             BusyIndicator.hide();
         }
     }
-    
-        public onClearSelectedItem(): void {
-            const table = this.byId("uiTreeHandlingUnit") as TreeTable
-            const selectedIndices = table.getSelectedIndices();
-            const lastIndex = selectedIndices[selectedIndices.length - 1];
-            table.removeSelectionInterval(selectedIndices[0],lastIndex);
-        }
-    
+
+    public onClearSelectedItem(): void {
+        const table = this.byId("uiTreeHandlingUnit") as TreeTable
+        const selectedIndices = table.getSelectedIndices();
+        const lastIndex = selectedIndices[selectedIndices.length - 1];
+        table.removeSelectionInterval(selectedIndices[0], lastIndex);
+    }
+
     /* ======================================================================================================================= */
     /* Internal Handlers                                                                                                       */
     /* ======================================================================================================================= */
@@ -193,18 +210,18 @@ export default class Homepage extends BaseController {
                 message: this.getResourceBundleText("taskCreated", [movedHUNumbers]),
                 type: MessageType.Success
             }));
-            (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);   
-            
+            (this.byId("stHandlingUnit") as SmartTable).rebindTable(true);
+
             (this.byId("stHandlingUnit") as SmartTable).attachEventOnce("dataReceived", () => {
-                table.setFirstVisibleRow(0); 
+                table.setFirstVisibleRow(0);
                 setTimeout(() => {
-                    const rowCount = (table.getBinding("rows") as ODataListBinding).getLength();  
+                    const rowCount = (table.getBinding("rows") as ODataListBinding).getLength();
                     if (rowCount) {
                         table.setFirstVisibleRow(rowCount - 1);
-                    }  
+                    }
                 }, 1000);
             });
-    
+
             this.entry.closeAndDestroyEntryDialog();
 
             // this.openMessagePopover();

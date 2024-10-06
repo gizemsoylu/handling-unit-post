@@ -42,6 +42,7 @@
                             key="EWMWarehouse"
                             mandatory="mandatory"
                             visibleInAdvancedArea="true"
+                            controlType="dropDownList"
                         />
                     </smartFilterBar:controlConfiguration>
                 </smartFilterBar:SmartFilterBar>

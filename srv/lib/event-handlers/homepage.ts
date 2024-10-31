@@ -30,7 +30,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     });
 
     huPallets.forEach(huItems => {
-        const result = dataOperations.handleChildNodes(parentNodeMap, huItems, nodeList, nodeId);
+        const result = dataOperations.handleChildNodes(parentNodeMap, huItems, nodeList, nodeId, huPallets);
         nodeList = result.nodeList;
         nodeId = result.nodeId;
     });
@@ -39,7 +39,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
 
     if (req.query.SELECT?.where) {
         const filters = req.query.SELECT.where as unknown as IWhereClause[];
-        nodeList = filterOperations.filterNodeList(nodeList, filters);
+        nodeList = filterOperations.filterNodeList(nodeList, filters, huPallets, parentNodeMap);
     }
 
     if (req.query.SELECT?.orderBy) {

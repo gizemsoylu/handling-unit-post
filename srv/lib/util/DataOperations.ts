@@ -44,8 +44,8 @@ export default class DataOperations {
                     EWMStorageBin: huItems.EWMStorageBin_1,
                     EWMStorageType: huItems.EWMStorageType_1,
                     ProductionOrder: huItems.ProductionOrder,
-                    Product:  +huItems.AvailableEWMStockQty > 0 ? huItems.Product : huItems.MaterialNumber,
-                    HUStatus:  +huItems.AvailableEWMStockQty > 0 ? 'Received' : 'Planned' 
+                    Product: +huItems.AvailableEWMStockQty > 0 ? huItems.Product : huItems.MaterialNumber,
+                    HUStatus: +huItems.AvailableEWMStockQty > 0 ? 'Received' : 'Planned'
                 });
 
                 nodeId++;
@@ -63,70 +63,42 @@ export default class DataOperations {
     }
 
     public handleChildNodes(
-        parentNodeMap: Map<string, { nodeId: number, subNodes: string[] }>,
-        huItems: IHandlingUnitItems,
-        nodeList: IHandlingUnitsArray,
-        nodeId: number
-    ): { nodeList: IHandlingUnitsArray, nodeId: number } {
+        parentNodeMap: Map<string, {
+            nodeId: number; subNodes: string[];
+        }>, huItems: IHandlingUnitItems, nodeList: IHandlingUnitsArray, nodeId: number, huPallets: IHandlingUnitsArray): { nodeList: IHandlingUnitsArray, nodeId: number } {
 
-        if(huItems.HUNumber !== huItems.SubHUNumber){
+        if (huItems.HUNumber !== huItems.SubHUNumber) {
             for (let [parentHU, parentNode] of parentNodeMap.entries()) {
-                if (parentNode.subNodes.includes(huItems.HUNumber)) { 
-                    const parentStorageBins = nodeList
-                        .filter(item => item.NodeID === parentNode.nodeId)
-                        .map(item => item.EWMStorageBin);
-    
-                    const parentStorageTypes = nodeList
-                        .filter(item => item.NodeID === parentNode.nodeId)
-                        .map(item => item.EWMStorageType);
 
-                    const parentProductionOrder = nodeList
-                        .filter(item => item.NodeID === parentNode.nodeId)
-                        .map(item => item.ProductionOrder);
-    
-                    const parentProduct = nodeList
-                        .filter(item => item.NodeID === parentNode.nodeId)
-                        .map(item => {
-                            if (+item.AvailableEWMStockQty > 0) {
-                                return item.Product;
-                            } else {
-                                return item.MaterialNumber;
-                            }
-                        });
+                if (parentNode.subNodes.includes(huItems.SubHUNumber)) {
+                    const exactSubHU = parentNode.subNodes.filter(subNode => subNode === huItems.SubHUNumber);
+                    const parentHUDetail = huPallets.filter(item => item.SubHUNumber == exactSubHU[0]);
+                    const childHUDetail = huPallets.filter(item => item.HUNumber == exactSubHU[0]);
 
-                    const parentStatus = nodeList
-                        .filter(item => item.NodeID === parentNode.nodeId)
-                        .map(item => {
-                            if (+item.AvailableEWMStockQty > 0) {
-                                return 'Received';
-                            } else {
-                                return 'Planned';
-                            }
-                        });
-    
                     nodeList.push({
                         ...huItems,
-                        HUNumber: huItems.HUNumber.replace(/^0+/, ''),
-                        PackagingMaterial: huItems.PackagingMaterialType,
+                        HUNumber: childHUDetail[0].HUNumber,
                         SubHUNumber: "",
                         NodeID: nodeId,
                         HierarchyLevel: 1,
                         ParentNodeID: parentNode.nodeId,
                         DrillState: "collapse",
-                        QuantityPerHU: +huItems.EWMStockQuantityInBaseUnit_1 || 0,
-                        EWMStorageBin: parentStorageBins.length ? parentStorageBins[0] : "",
-                        EWMStorageType: parentStorageTypes.length ? parentStorageTypes[0] : "",
-                        Product: parentProduct.length ? parentProduct[0] : "",
-                        ProductionOrder: parentProductionOrder.length ? parentProductionOrder[0] : "",
-                        HUStatus: parentStatus.length ? parentStatus[0] : ""
+                        QuantityPerHU: +childHUDetail[0].EWMStockQuantityInBaseUnit_1 || 0,
+                        EWMStorageBin: parentHUDetail[0].EWMStorageBin || "",
+                        EWMStorageType: parentHUDetail[0].EWMStorageType || "",
+                        ProductionOrder: parentHUDetail[0].ProductionOrder || "",
+                        Product: +parentHUDetail[0].AvailableEWMStockQty > 0 ? parentHUDetail[0].Product : parentHUDetail[0].MaterialNumber,
+                        HUStatus: +parentHUDetail[0].AvailableEWMStockQty > 0 ? 'Received' : 'Planned',
+                        PackagingMaterial: parentHUDetail[0].PackagingMaterial || ""
                     });
-    
+
                     nodeId++;
                     break;
                 }
             }
+
         }
- 
+
         return { nodeList, nodeId };
     }
 
@@ -140,11 +112,17 @@ export default class DataOperations {
 
                 if (hasChild) {
                     const allSameProduct = childNodes.every(child => child.Product === childNodes[0].Product);
-                    const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
-                    // const allSameProductionOrder = childNodes.every(child => child.ProductionOrder === childNodes[0].ProductionOrder);
-                    node.Product = allSameProduct ? childNodes[0].Product : "Multiple Product";
-                    // node.ProductionOrder = allSameProductionOrder ? childNodes[0].ProductionOrder : "Multiple Production Order";
-                    node.HUStatus = allSameStatus ? childNodes[0].HUStatus : "";
+                    // const allSameStatus = childNodes.every(child => child.HUStatus === childNodes[0].HUStatus);
+                    // const allSameCreationDate = childNodes.every(child => child.CreationDate === childNodes[0].CreationDate);
+                    // const allSameEWMStorageBin = childNodes.every(child => child.EWMStorageBin === childNodes[0].EWMStorageBin);
+                    // const allSameEWMStorageType = childNodes.every(child => child.EWMStorageType === childNodes[0].EWMStorageType);
+                    const allSameProductionOrder = childNodes.every(child => child.ProductionOrder === childNodes[0].ProductionOrder);
+                    node.Product = allSameProduct ? childNodes[0].Product : "Multiple Products";
+                    // node.HUStatus = allSameStatus ? childNodes[0].HUStatus : "Multiple Status";
+                    // node.CreationDate = allSameCreationDate ? allSameEWMStorageBin[0].CreationDate : "Multiple Dates";
+                    // node.EWMStorageBin = allSameEWMStorageBin ? allSameEWMStorageBin[0].EWMStorageBin : "Multiple Storage Bins";
+                    // node.EWMStorageType = allSameEWMStorageType ? allSameEWMStorageType[0].EWMStorageType : "Multiple Storage Types";
+                    node.ProductionOrder = allSameProductionOrder ? childNodes[0].ProductionOrder : "Multiple Production Orders";
                 }
             }
         });

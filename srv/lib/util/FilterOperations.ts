@@ -1,7 +1,7 @@
 import { IHandlingUnitsArray, IOrderByClause, IWhereClause } from "../../types/homepage.types";
 
 export default class FilterOperations {
-    public filterNodeList(nodeList: IHandlingUnitsArray, filters: (IWhereClause | string)[]): IHandlingUnitsArray {
+    public filterNodeList(nodeList: IHandlingUnitsArray, filters: (IWhereClause | string)[], huPallets: IHandlingUnitsArray, parentNodeMap: Map<string, { nodeId: number; subNodes: string[]; }>): IHandlingUnitsArray {
         let hasParentNodeID = false;
 
         filters.forEach(filter => {
@@ -90,7 +90,7 @@ export default class FilterOperations {
                 if (this.isIWhereClause(filter) && Array.isArray(filter.ref) && filter.ref[0] === 'HUNumber') {
                     const nextFilter = filters[index + 2];
                     if (nextFilter && typeof nextFilter === 'object' && 'val' in nextFilter) {
-                        HUNumber = nextFilter?.val; 
+                        HUNumber = nextFilter?.val;
                     }
                 }
             });
@@ -98,11 +98,25 @@ export default class FilterOperations {
             if (HUNumber) {
                 filteredNodes = nodeList.filter(node => node.HUNumber === HUNumber);
 
-                if (filteredNodes.length > 0) {
-                    const parentNodeID = filteredNodes[0].ParentNodeID; 
+                if (filteredNodes.length) {
+                    const parentNodeID = filteredNodes[0].ParentNodeID;
                     const parentNodes = nodeList.filter(node => node.NodeID === parentNodeID && node.HandlingUnitNumber_1.replace(/^0+/, '') === HUNumber);
 
                     filteredNodes = [...parentNodes];
+                }
+            }
+
+            if (!filteredNodes.length) {
+                let parentNode = huPallets.filter(node => node.SubHUNumber === HUNumber);
+
+                const parentSubNodes = parentNodeMap.get(parentNode[0].HUNumber)?.subNodes;
+
+                if (parentSubNodes && parentSubNodes.includes(HUNumber)) {
+                    const matchingNode = nodeList.find(node =>
+                        parentSubNodes.includes(node.HandlingUnitNumber_1.replace(/^0+/, ''))
+                    );
+
+                    matchingNode ? filteredNodes.push(matchingNode) : []
                 }
             }
         }

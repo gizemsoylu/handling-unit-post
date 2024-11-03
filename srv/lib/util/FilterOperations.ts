@@ -2,51 +2,65 @@ import { IHandlingUnitsArray, IOrderByClause, IWhereClause } from "../../types/h
 
 export default class FilterOperations {
     public filterNodeList(nodeList: IHandlingUnitsArray, filters: (IWhereClause | string)[], huPallets: IHandlingUnitsArray, parentNodeMap: Map<string, { nodeId: number; subNodes: string[]; }>): IHandlingUnitsArray {
-        let hasParentNodeID = false;
 
-        filters.forEach(filter => {
-            if (this.isIWhereClause(filter) && filter.ref && filter.ref[0] === 'ParentNodeID') {
-                hasParentNodeID = true;
-            }
-        });
-
+        const hasParentNodeID = filters.some(filter =>
+            this.isIWhereClause(filter) && filter.ref && filter.ref[0] === 'ParentNodeID'
+        );
+        
         if (hasParentNodeID) {
-            let skipNext = false;
-            filters = filters.reduce((acc, filter, index) => {
-                if (skipNext) {
-                    if (this.isIWhereClause(filter) && filter.hasOwnProperty('val')) {
-                        skipNext = false;
-                    }
-                    return acc;
-                }
+            const parentNodeFilterIndex = filters.findIndex(filter => 
+                this.isIWhereClause(filter) && filter.ref && filter.ref[0] === 'ParentNodeID'
+            );
+        
+            if (parentNodeFilterIndex !== -1) {
+                const parentNodeCondition = filters.slice(parentNodeFilterIndex, parentNodeFilterIndex + 3);
+                filters = parentNodeCondition;
+            }
+        }
 
-                if (this.isIWhereClause(filter) && filter.hasOwnProperty('ref') && Array.isArray(filter.ref) && filter.ref[0] === 'HUNumber') {
+        let skipNext = false;
+        filters = filters.reduce((acc, filter, index) => {
+            if (skipNext) {
+                if (this.isIWhereClause(filter) && filter.hasOwnProperty('val')) {
+                    skipNext = false;
+                }
+                return acc;
+            }
+
+            if (this.isIWhereClause(filter) && filter.hasOwnProperty('ref') && Array.isArray(filter.ref) && filter.ref[0] === 'HierarchyLevel') {
+                const nextFilter = filters[index + 2];
+                if (nextFilter && this.isIWhereClause(nextFilter) && nextFilter.hasOwnProperty('val') && nextFilter.val === 0) {
                     skipNext = true;
                     return acc;
                 }
+            }
 
-                if (
-                    index > 0 &&
-                    typeof filters[index - 1] === 'string' &&
-                    ['and', 'or', '='].includes(filters[index - 1] as string)
-                ) {
-                    if (this.isIWhereClause(filters[index]) && filters[index].hasOwnProperty('ref') && filters[index].ref[0] === 'HUNumber') {
-                        skipNext = true;
-                        acc.pop();
-                        return acc;
-                    }
-                }
+            if (this.isIWhereClause(filter) && filter.hasOwnProperty('ref') && Array.isArray(filter.ref) && filter.ref[0] === 'HUNumber') {
+                skipNext = true;
+                return acc;
+            }
 
-                if (this.isIWhereClause(filter) && filter.hasOwnProperty('xpr')) {
-                    if (index > 0 && typeof filters[index - 1] === 'string' && ['and', 'or'].includes(filters[index - 1] as string)) {
-                        acc.pop();
-                    }
+            if (
+                index > 0 &&
+                typeof filters[index - 1] === 'string' &&
+                ['and', 'or', '='].includes(filters[index - 1] as string)
+            ) {
+                if (this.isIWhereClause(filters[index]) && filters[index].hasOwnProperty('ref') && filters[index].ref[0] === 'HUNumber') {
+                    skipNext = true;
+                    acc.pop();
                     return acc;
                 }
+            }
 
-                return [...acc, filter];
-            }, [] as (IWhereClause | string)[]);
-        }
+            if (this.isIWhereClause(filter) && filter.hasOwnProperty('xpr')) {
+                if (index > 0 && typeof filters[index - 1] === 'string' && ['and', 'or'].includes(filters[index - 1] as string)) {
+                    acc.pop();
+                }
+                return acc;
+            }
+
+            return [...acc, filter];
+        }, [] as (IWhereClause | string)[]);
 
         let filteredNodes = nodeList.filter(node => {
             let currentField = '';
@@ -75,16 +89,26 @@ export default class FilterOperations {
                         if (isMatching) {
                             isMatching = this.applyFilter(node, currentField, currentOperator, currentValue);
                         }
+                    } else if (filter.hasOwnProperty('func')) {
+                        const funcName = filter.func;
+                        const args = filter.args;
+                        const field = args[0].ref[0];
+                        const value = args[1].val;
+                        isMatching = this.applyFilter(node, field, funcName, value);
                     } else if (filter.hasOwnProperty('xpr')) {
                         isMatching = this.processXpr(node, filter.xpr);
+                    }
+
+                    if (!isMatching) {
+                        break;
                     }
                 }
             }
             return isMatching;
         });
 
-        if (filteredNodes.length === 0) {
-            let HUNumber: any = null;
+        if (!filteredNodes.length) {
+            let HUNumber: string | null | number | Date = null;
 
             filters.forEach((filter, index) => {
                 if (this.isIWhereClause(filter) && Array.isArray(filter.ref) && filter.ref[0] === 'HUNumber') {
@@ -106,22 +130,50 @@ export default class FilterOperations {
                 }
             }
 
-            if (!filteredNodes.length) {
+            if (HUNumber && !filteredNodes.length) {
                 let parentNode = huPallets.filter(node => node.SubHUNumber === HUNumber);
 
-                const parentSubNodes = parentNodeMap.get(parentNode[0].HUNumber)?.subNodes;
+                if (parentNode.length) {
+                    const parentSubNodes = parentNodeMap.get(parentNode[0].HUNumber)?.subNodes;
 
-                if (parentSubNodes && parentSubNodes.includes(HUNumber)) {
-                    const matchingNode = nodeList.find(node =>
-                        parentSubNodes.includes(node.HandlingUnitNumber_1.replace(/^0+/, ''))
-                    );
+                    if (parentSubNodes && parentSubNodes.includes(HUNumber)) {
+                        const matchingNode = nodeList.find(node =>
+                            parentSubNodes.includes(node.HandlingUnitNumber_1.replace(/^0+/, ''))
+                        );
 
-                    matchingNode ? filteredNodes.push(matchingNode) : []
+                        matchingNode ? filteredNodes.push(matchingNode) : []
+                    }
                 }
             }
         }
 
-        return filteredNodes;
+        const hasParentNodeIDFilter = filters.some(filter =>
+            this.isIWhereClause(filter) && filter.ref && filter.ref[0] === 'ParentNodeID'
+        );
+        
+        if (hasParentNodeIDFilter) {
+            console.log(`Returning ${filteredNodes.length} nodes directly (ParentNodeID filter applied)`);
+            return filteredNodes;
+        }
+        
+        const parentNodes: IHandlingUnitsArray = [];
+        const uniqueParentIds = new Set<number>(); 
+        
+        for (const node of filteredNodes) {
+            if (node.ParentNodeID) {
+                const parentNode = nodeList.find(parent => parent.NodeID === node.ParentNodeID);
+                if (parentNode && !uniqueParentIds.has(parentNode.NodeID)) {
+                    parentNodes.push(parentNode);
+                    uniqueParentIds.add(parentNode.NodeID);
+                }
+            } else {
+                parentNodes.push(node);
+                uniqueParentIds.add(node.NodeID);
+            }
+        }
+        
+        console.log(`Returning ${parentNodes.length} parent nodes`);
+        return parentNodes;
     }
 
     private isIWhereClause(filter: any): filter is IWhereClause {
@@ -130,7 +182,8 @@ export default class FilterOperations {
             filter !== null &&
             (
                 (filter.hasOwnProperty('ref') && Array.isArray(filter.ref)) ||
-                filter.hasOwnProperty('xpr')
+                filter.hasOwnProperty('xpr') ||
+                filter.hasOwnProperty('func') || filter.hasOwnProperty('val')
             )
         );
     }
@@ -161,6 +214,10 @@ export default class FilterOperations {
             } else if (part.hasOwnProperty('xpr')) {
                 isMatching = this.processXpr(node, part.xpr);
             }
+
+            if (!isMatching) {
+                break;
+            }
         }
 
         return isMatching;
@@ -183,15 +240,15 @@ export default class FilterOperations {
                 return node[field] != value;
             case 'contains':
                 return typeof node[field] === 'string' && node[field].includes(value);
-            case 'does not contain':
+            case 'not contains':
                 return typeof node[field] === 'string' && !node[field].includes(value);
-            case 'startsWith':
+            case 'startswith':
                 return typeof node[field] === 'string' && node[field].startsWith(value);
-            case 'does not start with':
+            case 'not startswith':
                 return typeof node[field] === 'string' && !node[field].startsWith(value);
-            case 'endsWith':
+            case 'endswith':
                 return typeof node[field] === 'string' && node[field].endsWith(value);
-            case 'does not end with':
+            case 'not endswith':
                 return typeof node[field] === 'string' && !node[field].endsWith(value);
             case 'empty':
                 return node[field] === null || node[field] === undefined || node[field] === '';

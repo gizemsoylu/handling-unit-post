@@ -146,7 +146,7 @@ export default class Homepage extends BaseController {
     }
 
     public onODataRequestFail(event: Model$RequestFailedEvent): void {
-        this.openMessagePopover();
+        // this.openMessagePopover();
     }
 
     private async onHUSelectionChange(event: Table$RowSelectionChangeEvent) {

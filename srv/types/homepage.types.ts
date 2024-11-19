@@ -8,7 +8,6 @@ export interface IHandlingUnits {
     ParentNodeID?: number | null;
     DrillState: string;
     HandlingUnitNumber: string;
-    HandlingUnitNumber_1?: string;
     HandlingUnitStatus: string;
     HUType?: string;
     PackagingMaterial?: string;
@@ -31,6 +30,7 @@ export interface IHandlingUnitsArray extends Array<IHandlingUnits> {
 }
 
 export interface IHandlingUnitItems {
+    HandlingUnitNumber: string;
     YY1_PlannedMaterial_HUH: string | undefined;
     MaterialNumber?: string | undefined;
     ProductionOrder: string;
@@ -46,16 +46,12 @@ export interface IHandlingUnitItems {
     AvailableEWMStockQty: number;
     EWMStorageBin: string;
     EWMStorageType: string;
-    HandlingUnitNumber: string;
     HandlingUnitNumber_1: string;
-    HandlingUnitNumber_1: string;
-    HandlingUnitNumber: string;
     QuantityAvailability: string;
     QuantityPerHU: number;
     QuantityPerHu: number;
     HUType: string;
     HandlingUnitType: string;
-    HandlingUnitStatus: string;
     HandlingUnitStatus: string;
     SubEWMWarehouse: string;
     EWMWarehouse_1: string;
@@ -87,10 +83,10 @@ export interface IMoveHUBody {
 }
 export interface IWhereClause {
     xpr: (string | IWhereClause)[];
-    args: any;
-    func: string;
-    ref: string[];
-    val: number | string | Date | null;
+    args?: any;
+    func?: string;
+    ref?: string[];
+    val?: number | string | Date | null;
     search?:string;
 }
 

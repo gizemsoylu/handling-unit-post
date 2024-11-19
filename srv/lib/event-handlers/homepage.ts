@@ -60,7 +60,24 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
                                 xpr: [
                                     { ref: ["AvailableEWMStockQty"] },
                                     "=",
-                                    { val: 0 }
+                                    { val: null }
+                                ]
+                            } as IWhereClause);
+                            acc.push({
+                                xpr: [
+                                    { ref: ["AvailableEWMStockQty"] },
+                                    "=",
+                                    { val: null }
+                                ]
+                            } as IWhereClause);
+
+                            acc.push("and");
+
+                            acc.push({
+                                xpr: [
+                                    { ref: ["HandlingUnitNumber_1"] },
+                                    "!=",
+                                    { val: "" }
                                 ]
                             } as IWhereClause);
                         }
@@ -110,8 +127,18 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
                     acc.push({
                         xpr: [
                             { ref: ["AvailableEWMStockQty"] },
-                            "<",
-                            { val: 1 }
+                            "=",
+                            { val: null }
+                        ]
+                    } as IWhereClause);
+
+                    acc.push("and");
+
+                    acc.push({
+                        xpr: [
+                            { ref: ["HandlingUnitNumber_1"] },
+                            "!=",
+                            { val: "" }
                         ]
                     } as IWhereClause);
                 }

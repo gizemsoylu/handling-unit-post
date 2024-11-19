@@ -29,10 +29,8 @@ import PageCL from "../util/PageCL";
 import SmartTable from "sap/ui/comp/smarttable/SmartTable";
 import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 import Dialog from "sap/m/Dialog";
-import Form from "sap/ui/layout/form/Form";
 import Control from "sap/ui/core/Control";
 import { ExportBase$BeforeExportEvent } from "sap/ui/export/ExportBase";
-import Spreadsheet from "sap/ui/export/Spreadsheet";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -138,19 +136,21 @@ export default class Homepage extends BaseController {
         table.removeSelectionInterval(selectedIndices[0], lastIndex);
     }
 
-    public onBeforeExport(event:ExportBase$BeforeExportEvent): void {
-
+    public onBeforeExport(event: ExportBase$BeforeExportEvent): void {
         const exportSettings = event.getParameter("exportSettings") as {
             dataSource: {
                 count: number;
+                downloadLimit: number;
             };
         };
-    
+
         if (exportSettings && exportSettings.dataSource) {
             const table = this.byId("uiTreeHandlingUnit") as TreeTable;
             const rowBinding = table.getBinding("rows") as ODataListBinding;
             const length = rowBinding.getLength();
-            exportSettings.dataSource.count = length; 
+
+            exportSettings.dataSource.count = length;
+            exportSettings.dataSource.downloadLimit = length;
         }
     }
 

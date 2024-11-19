@@ -2,14 +2,14 @@ using HandlingUnitPost as service from '../../../srv/data-provider';
 
 annotate service.HandlingUnits {
     @Common.ValueListWithFixedValues: true
-    HUStatus        @Common.ValueList: {
+    HandlingUnitStatus        @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHStatus',
         SearchSupported,
         Parameters    : [{
             $Type            : 'Common.ValueListParameterInOut',
-            LocalDataProperty: HUStatus,
-            ValueListProperty: 'HUStatus'
+            LocalDataProperty: HandlingUnitStatus,
+            ValueListProperty: 'HandlingUnitStatus'
         }]
     };
 
@@ -24,14 +24,14 @@ annotate service.HandlingUnits {
         }]
     };
 
-    HUNumber        @Common.ValueList: {
+    HandlingUnitNumber        @Common.ValueList: {
         $Type         : 'Common.ValueListType',
         CollectionPath: 'VHHUNumbers',
         SearchSupported,
         Parameters    : [{
             $Type            : 'Common.ValueListParameterInOut',
-            LocalDataProperty: HUNumber,
-            ValueListProperty: 'HUNumber'
+            LocalDataProperty: HandlingUnitNumber,
+            ValueListProperty: 'HandlingUnitNumber'
         }]
     };
 

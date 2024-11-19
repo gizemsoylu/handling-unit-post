@@ -11,18 +11,18 @@ annotate service.HandlingUnits {
 annotate service.HandlingUnits with @(UI: {
     SelectionFields: [
         EWMWarehouse,
-        HUNumber,
+        HandlingUnitNumber,
         Product,
         EWMStorageBin,
         EWMStorageType,
         ProductionOrder,
-        HUStatus
+        HandlingUnitStatus
     ],
 
     LineItem       : [
         {
             $Type                : 'UI.DataField',
-            Value                : HUNumber,
+            Value                : HandlingUnitNumber,
             ![@HTML5.CssDefaults]: {
                 $Type: 'HTML5.CssDefaultsType',
                 width: '12rem',

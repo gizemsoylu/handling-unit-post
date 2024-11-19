@@ -1,12 +1,12 @@
 @cds.persistence.skip
 entity HandlingUnits {
     key NodeID                      : Integer;
-    key HUNumber                    : String;
-        SubHUNumber                 : String;
+    key HandlingUnitNumber          : String;
+        HandlingUnitNumber_1        : String;
         HierarchyLevel              : Integer;
         ParentNodeID                : Integer;
         DrillState                  : String;
-        HUStatus                    : String;
+        HandlingUnitStatus                    : String;
         HUType                      : String;
         Product                     : String;
         PackagingMaterial           : String;

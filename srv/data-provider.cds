@@ -32,13 +32,13 @@ service HandlingUnitPost {
     /* ValueHelp Views                                                                        */
     /********************************************************************************************************/
     @readonly
-    entity VHStatus               as select distinct key HUStatus from DBHandlingUnits;
+    entity VHStatus               as select distinct key HandlingUnitStatus from DBHandlingUnits;
 
     @readonly
     entity VHWarehouses           as select distinct key EWMWarehouse from DBHandlingUnits;
 
     @readonly
-    entity VHHUNumbers            as select distinct key HUNumber from DBHandlingUnits;
+    entity VHHUNumbers            as select distinct key HandlingUnitNumber from DBHandlingUnits;
 
     @readonly
     entity VHProducts             as select distinct key Product from DBHandlingUnits;

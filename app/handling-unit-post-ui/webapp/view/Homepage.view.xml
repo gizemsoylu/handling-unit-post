@@ -53,9 +53,10 @@
                     tableType="TreeTable"
                     useTablePersonalisation="false"
                     header="{i18n>handlingUnit}"
-                    showRowCount="false"
+                    showRowCount="true"
                     enableCopy="false"
                     enableExport="true"
+                    beforeExport=".onBeforeExport"
                     enableAutoBinding="false"
                     editTogglable="false"
                     app:useSmartToggle="false"
@@ -91,7 +92,7 @@
                     >
                         <table:rowSettingsTemplate>
                             <table:RowSettings
-                                highlight="{path: 'HUStatus', formatter: '.formatter.setStatusHighlight'}"
+                                highlight="{path: 'HandlingUnitStatus', formatter: '.formatter.setStatusHighlight'}"
                             />
                         </table:rowSettingsTemplate>
                         <table:rowMode>
@@ -102,15 +103,15 @@
                                 <table:customData>
                                     <core:CustomData
                                         key="p13nData"
-                                        value='\{"columnKey": "HUStatus", "leadingProperty": "HUStatus", "columnIndex": 1}'
+                                        value='\{"columnKey": "HandlingUnitStatus", "leadingProperty": "HandlingUnitStatus", "columnIndex": 1}'
                                     />
                                 </table:customData>
                                 <Label text="{i18n>status}" />
                                 <table:template>
                                     <ObjectStatus
-                                        text="{HUStatus}"
+                                        text="{HandlingUnitStatus}"
                                         state="{
-								path: 'HUStatus',
+								path: 'HandlingUnitStatus',
 								formatter: '.formatter.setStatusHighlight'
 							}"
                                     />

@@ -31,6 +31,8 @@ import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 import Dialog from "sap/m/Dialog";
 import Form from "sap/ui/layout/form/Form";
 import Control from "sap/ui/core/Control";
+import { ExportBase$BeforeExportEvent } from "sap/ui/export/ExportBase";
+import Spreadsheet from "sap/ui/export/Spreadsheet";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -39,7 +41,7 @@ export default class Homepage extends BaseController {
     public formatter = formatter;
     private entry: EntryCreateCL;
     private EWMWarehouse: string;
-    private HUNumber: string;
+    private HandlingUnitNumber: string;
     private EWMStorageBin: string;
 
     /* ======================================================================================================================= */
@@ -136,6 +138,22 @@ export default class Homepage extends BaseController {
         table.removeSelectionInterval(selectedIndices[0], lastIndex);
     }
 
+    public onBeforeExport(event:ExportBase$BeforeExportEvent): void {
+
+        const exportSettings = event.getParameter("exportSettings") as {
+            dataSource: {
+                count: number;
+            };
+        };
+    
+        if (exportSettings && exportSettings.dataSource) {
+            const table = this.byId("uiTreeHandlingUnit") as TreeTable;
+            const rowBinding = table.getBinding("rows") as ODataListBinding;
+            const length = rowBinding.getLength();
+            exportSettings.dataSource.count = length; 
+        }
+    }
+
     /* ======================================================================================================================= */
     /* Internal Handlers                                                                                                       */
     /* ======================================================================================================================= */
@@ -183,13 +201,13 @@ export default class Homepage extends BaseController {
         const EWMStorageType = await this.getStorageType(this.EWMStorageBin)
 
         const contexts = selectedIndices.map(index => {
-            return ((table.getContextByIndex(index) as Context).getObject() as { HUNumber: string });
+            return ((table.getContextByIndex(index) as Context).getObject() as { HandlingUnitNumber: string });
         });
 
         const moveHUsArray: IMoveHUtoBin[] = (contexts.map(context => {
             return {
                 EWMWarehouse: this.EWMWarehouse,
-                SourceHandlingUnit: context.HUNumber,
+                SourceHandlingUnit: context.HandlingUnitNumber,
                 DestinationStorageBin: this.EWMStorageBin,
                 DestinationStorageType: EWMStorageType,
                 WarehouseProcessType: "ZRF1"
@@ -205,7 +223,7 @@ export default class Homepage extends BaseController {
         try {
             await odata.create();
             BusyIndicator.hide();
-            const movedHUNumbers = contexts.map(context => context.HUNumber).join(", ");
+            const movedHUNumbers = contexts.map(context => context.HandlingUnitNumber).join(", ");
             Messaging.addMessages(new Message({
                 message: this.getResourceBundleText("taskCreated", [movedHUNumbers]),
                 type: MessageType.Success

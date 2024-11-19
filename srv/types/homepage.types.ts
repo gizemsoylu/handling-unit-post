@@ -7,9 +7,9 @@ export interface IHandlingUnits {
     HierarchyLevel: number;
     ParentNodeID?: number | null;
     DrillState: string;
-    HUNumber: string;
-    SubHUNumber?: string;
-    HUStatus: string;
+    HandlingUnitNumber: string;
+    HandlingUnitNumber_1?: string;
+    HandlingUnitStatus: string;
     HUType?: string;
     PackagingMaterial?: string;
     PackagingMaterialType?: string;
@@ -46,8 +46,8 @@ export interface IHandlingUnitItems {
     AvailableEWMStockQty: number;
     EWMStorageBin: string;
     EWMStorageType: string;
-    HUNumber: string;
-    SubHUNumber: string;
+    HandlingUnitNumber: string;
+    HandlingUnitNumber_1: string;
     HandlingUnitNumber_1: string;
     HandlingUnitNumber: string;
     QuantityAvailability: string;
@@ -55,7 +55,7 @@ export interface IHandlingUnitItems {
     QuantityPerHu: number;
     HUType: string;
     HandlingUnitType: string;
-    HUStatus: string;
+    HandlingUnitStatus: string;
     HandlingUnitStatus: string;
     SubEWMWarehouse: string;
     EWMWarehouse_1: string;

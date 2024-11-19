@@ -2,12 +2,12 @@ using HandlingUnitPost as service from '../../../srv/data-provider';
 
 annotate service.HandlingUnits with {
     NodeID                      @Common.Label: '{i18n>NodeID}';
-    HUNumber                    @Common.Label: '{i18n>HUNumber}';
-    SubHUNumber                 @Common.Label: '{i18n>SubHUNumber}';
+    HandlingUnitNumber                    @Common.Label: '{i18n>HandlingUnitNumber}';
+    HandlingUnitNumber_1                 @Common.Label: '{i18n>HandlingUnitNumber_1}';
     HierarchyLevel              @Common.Label: '{i18n>HierarchyLevel}';
     ParentNodeID                @Common.Label: '{i18n>ParentNodeID}';
     DrillState                  @Common.Label: '{i18n>DrillState}';
-    HUStatus                    @Common.Label: '{i18n>HUStatus}';
+    HandlingUnitStatus                    @Common.Label: '{i18n>HandlingUnitStatus}';
     HUType                      @Common.Label: '{i18n>HUType}';
     Product                     @Common.Label: '{i18n>Product}';
     PackagingMaterial           @Common.Label: '{i18n>PackagingMaterial}';

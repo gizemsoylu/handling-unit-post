@@ -1,23 +1,166 @@
 import { OnEventHandler, TypedRequest, connect, operator } from "@sap/cds";
-import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IMoveStorageBins, IOrderByClause, IMoveHUBody } from "../../types/homepage.types";
+import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IOrderByClause, IMoveHUBody } from "../../types/homepage.types";
 import FilterOperations from "../util/FilterOperations";
 import DataOperations from "../util/DataOperations";
 
 const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHandlingUnits>): Promise<IHandlingUnits[]> {
-    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-    const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
-
-    let huPallets = await handlingCDS.run(
-        SELECT.from(YY1_HUInfoPalletbox_ewm));
-
     const dataOperations = new DataOperations();
     const filterOperations = new FilterOperations();
+
+    const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
+    const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
+    const whereClause = req.query.SELECT?.where as any[];
+
+    const cleanedWhereClause = whereClause ? filterOperations.removeFilters(whereClause, ["HierarchyLevel", "ParentNodeID"]) : null;
+
+    const parentNodeID = FilterOperations.getGlobalParentNodeID();
+    const hierarchyLevel = parentNodeID ? 1 : 0;
+
+    const extendedWhereClause = cleanedWhereClause?.reduce<(string | IWhereClause)[]>((acc, item, index, array) => {
+        if (typeof item === "object" && item.xpr) {
+            let skipXprIndexes = 0;
+
+            const modifiedXpr = item.xpr.reduce<(string | IWhereClause)[]>((xprAcc, xprItem, xprIndex, xprArray) => {
+                if (skipXprIndexes > 0) {
+                    skipXprIndexes--;
+                    return xprAcc;
+                }
+
+                if (typeof xprItem === "object" && xprItem.ref?.[0] === "HandlingUnitNumber") {
+                    const nextXprItem = xprArray[xprIndex + 2];
+                    if (typeof nextXprItem === "object" && nextXprItem.val) {
+                        const handlingUnitValue = String(nextXprItem.val).padStart(20, "0");
+
+                        xprAcc.push({
+                            xpr: [
+                                { ref: ["HandlingUnitNumber"] }, "=", { val: handlingUnitValue },
+                                "or",
+                                { ref: ["HandlingUnitNumber_1"] }, "=", { val: handlingUnitValue }
+                            ]
+                        } as IWhereClause);
+
+                        skipXprIndexes = 2;
+                        return xprAcc;
+                    }
+                }
+
+                if (typeof xprItem === "object" && xprItem.ref?.[0] === "HandlingUnitStatus") {
+                    const nextXprItem = xprArray[xprIndex + 2];
+                    if (typeof nextXprItem === "object" && nextXprItem.val) {
+                        if (nextXprItem.val === "Received") {
+                            xprAcc.push({
+                                xpr: [
+                                    { ref: ["AvailableEWMStockQty"] },
+                                    ">",
+                                    { val: 0 }
+                                ]
+                            } as IWhereClause);
+                        } else if (nextXprItem.val === "Planned") {
+                            xprAcc.push({
+                                xpr: [
+                                    { ref: ["AvailableEWMStockQty"] },
+                                    "=",
+                                    { val: 0 }
+                                ]
+                            } as IWhereClause);
+                        }
+
+                        skipXprIndexes = 2;
+                        return xprAcc;
+                    }
+                }
+
+                xprAcc.push(xprItem);
+                return xprAcc;
+            }, []);
+
+            acc.push({ ...item, xpr: modifiedXpr });
+            return acc;
+        }
+
+        if (typeof item === "object" && item.ref?.[0] === "HandlingUnitNumber") {
+            const nextItem = array[index + 2];
+            if (typeof nextItem === "object" && nextItem.val) {
+                const handlingUnitValue = String(nextItem.val).padStart(20, "0");
+
+                acc.push({
+                    xpr: [
+                        { ref: ["HandlingUnitNumber"] }, "=", { val: handlingUnitValue },
+                        "or",
+                        { ref: ["HandlingUnitNumber_1"] }, "=", { val: handlingUnitValue }
+                    ]
+                } as IWhereClause);
+
+                return acc;
+            }
+        }
+
+        if (typeof item === "object" && item.ref?.[0] === "HandlingUnitStatus") {
+            const nextItem = array[index + 2];
+            if (typeof nextItem === "object" && nextItem.val) {
+                if (nextItem.val === "Received") {
+                    acc.push({
+                        xpr: [
+                            { ref: ["AvailableEWMStockQty"] },
+                            ">",
+                            { val: 0 }
+                        ]
+                    } as IWhereClause);
+                } else if (nextItem.val === "Planned") {
+                    acc.push({
+                        xpr: [
+                            { ref: ["AvailableEWMStockQty"] },
+                            "<",
+                            { val: 1 }
+                        ]
+                    } as IWhereClause);
+                }
+
+                index += 2;
+                if (array[index + 1] === "and" || array[index + 1] === "or") {
+                    index += 1;
+                }
+                return acc;
+            }
+        }
+
+        const previousItem = array[index - 1];
+        const twoItemsBefore = array[index - 2];
+
+        if (
+            (typeof previousItem === "object" && previousItem.ref?.[0] === "HandlingUnitNumber") ||
+            (typeof twoItemsBefore === "object" && twoItemsBefore.ref?.[0] === "HandlingUnitNumber")
+        ) {
+            return acc;
+        }
+
+        if (
+            (typeof previousItem === "object" && previousItem.ref?.[0] === "HandlingUnitStatus") ||
+            (typeof twoItemsBefore === "object" && twoItemsBefore.ref?.[0] === "HandlingUnitStatus")
+        ) {
+            return acc;
+        }
+
+        acc.push(item);
+        return acc;
+    }, []);
+
+    const additionalFilter = [
+        { ref: ["HandlingUnitIndicator"] },
+        "!=",
+        { val: "A" }
+    ];
+
+    let finalWhereClause: any[] = extendedWhereClause
+        ? [...extendedWhereClause, "and", ...additionalFilter]
+        : additionalFilter;
+
+
+    let huPallets = await handlingCDS.run(SELECT.from(YY1_HUInfoPalletbox_ewm).where(finalWhereClause));
 
     const parentNodeMap = new Map<string, { nodeId: number, subNodes: string[] }>();
     let nodeList: IHandlingUnitsArray = [];
     let nodeId = 1;
-
-    huPallets = huPallets.filter((huItems: IHandlingUnitItems) => huItems.HandlingUnitIndicator !== 'A');
 
     huPallets.forEach((huItems: IHandlingUnitItems) => {
         huItems = dataOperations.formatHUItems(huItems);
@@ -29,23 +172,64 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         nodeId = result.nodeId;
     });
 
-    huPallets.forEach(huItems => {
-        const result = dataOperations.handleChildNodes(parentNodeMap, huItems, nodeList, nodeId, huPallets);
-        nodeList = result.nodeList;
-        nodeId = result.nodeId;
+    if (hierarchyLevel == 0) {
+        nodeList = nodeList.filter(item =>
+            item.HierarchyLevel !== null &&
+            item.HierarchyLevel !== undefined &&
+            +item.HierarchyLevel === +hierarchyLevel
+        );
+    }
+
+    if (parentNodeID) {
+        nodeList = nodeList.filter(item =>
+            item.ParentNodeID !== null &&
+            item.ParentNodeID !== undefined &&
+            +item.ParentNodeID === +parentNodeID
+        );
+
+        let matchingKey: string = "";
+        for (const [key, value] of parentNodeMap.entries()) {
+            if (value.nodeId === +parentNodeID) {
+                matchingKey = key;
+                break;
+            }
+        }
+
+        const matchingNode = parentNodeMap.get(matchingKey);
+        if (matchingNode)
+            for (const huItems of huPallets) {
+                const result = await dataOperations.handleChildNodes(
+                    matchingNode,
+                    huItems,
+                    nodeList,
+                    nodeId,
+                    huPallets,
+                    handlingCDS,
+                    YY1_HUInfoPalletbox_ewm
+                );
+                nodeList = result.nodeList;
+                nodeId = result.nodeId;
+            }
+        nodeList = dataOperations.updateNodeList(nodeList);
+    }
+
+    nodeList.forEach(node => {
+        const parentNode = parentNodeMap.get(node.HandlingUnitNumber);
+
+        if (parentNode && parentNode.subNodes.length) {
+            node.DrillState = "expanded";
+        } else {
+            node.DrillState = "collapse";
+        }
     });
 
-    nodeList = dataOperations.updateNodeList(nodeList);
-
-    if (req.query.SELECT?.where) {
-        const filters = req.query.SELECT.where as unknown as IWhereClause[];
-        nodeList = filterOperations.filterNodeList(nodeList, filters, huPallets, parentNodeMap);
-    }
 
     if (req.query.SELECT?.orderBy) {
         const orderBy = req.query.SELECT.orderBy as unknown as IOrderByClause[];
         nodeList = filterOperations.sortNodes(nodeList, orderBy);
     }
+
+    FilterOperations.setGlobalParentNodeID(null);
 
     nodeList.$count = nodeList.length;
     return nodeList;
@@ -60,19 +244,19 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
             const body = { DestinationStorageBin, DestinationStorageType, SourceHandlingUnit, WarehouseProcessType, EWMWarehouse };
             const warehouseOrderSrv = await connect.to("WAREHOUSEORDER");
             let success = false;
-            let lastErrorMessage = ""; 
+            let lastErrorMessage = "";
 
             while (!success) {
                 try {
                     const response = await warehouseOrderSrv.send("POST", "/WarehouseTask", body);
                     success = true;
-                    return response; 
+                    return response;
                 } catch (error) {
                     if (error instanceof Error) {
                         lastErrorMessage = error.message;
 
                         if (error.message.includes("already being processed by user") || error.message.includes("al bewerkt door gebruiker")) {
-                            continue; 
+                            continue;
                         } else {
                             break;
                         }
@@ -83,7 +267,7 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
             if (!success) {
                 req.error({
                     code: 'Create-Warehouse-Task',
-                    message: lastErrorMessage, 
+                    message: lastErrorMessage,
                     target: 'EWMStorageBin',
                     status: 500
                 });
@@ -112,8 +296,8 @@ const moveHandlingUnits: OnEventHandler = async function (req: TypedRequest<IMov
 /* Value Help Operations                                                                                                   */
 /* ======================================================================================================================= */
 
-const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitStatus: string }[]>): Promise<{ HUStatus: string }[]> {
-    return [{ HUStatus: "Planned" }, { HUStatus: "Received" }];
+const getHandlingUnitStatus: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitStatus: string }[]>): Promise<{ HandlingUnitStatus: string }[]> {
+    return [{ HandlingUnitStatus: "Planned" }, { HandlingUnitStatus: "Received" }];
 }
 
 const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedRequest<{ EWMWarehouse: string }[]>): Promise<{ EWMWarehouse: string }[]> {
@@ -121,6 +305,7 @@ const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedReque
     const allEWMWarehouses = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('EWMWarehouse').where({
         PackagingMaterialType: ['Z001', 'Z002']
     }));
+
     let uniqueEWMWarehouses: { EWMWarehouse: string }[] = [];
 
     allEWMWarehouses.forEach((item: { EWMWarehouse: string; }) => {
@@ -132,33 +317,37 @@ const getHandlingUnitEWMHouses: OnEventHandler = async function (req: TypedReque
     return uniqueEWMWarehouses;
 }
 
-const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest<{ HandlingUnitNumber: string }[]>): Promise<{ HUNumber: string }[]> {
+const getHandlingUnitNumbers: OnEventHandler = async function (
+    req: TypedRequest<{ HandlingUnitNumber: string }[]>
+): Promise<{ HandlingUnitNumber: string }[]> {
     try {
         const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-        const allHUs = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('HandlingUnitNumber').where({
-            PackagingMaterialType: ['Z001', 'Z002']
-        }));
-        let uniqueHUs: { HUNumber: string }[] = [];
 
-        allHUs.forEach((item: { HandlingUnitNumber: string }) => {
-            if (item.HandlingUnitNumber !== '' && !uniqueHUs.some(hu => hu.HUNumber === item.HandlingUnitNumber)) {
-                uniqueHUs.push({ HUNumber: item.HandlingUnitNumber.replace(/^0+/, '') });
-            }
-        });
+        let allHUsQuery = SELECT.from('YY1_HUInfoPalletbox_ewm')
+            .columns(['HandlingUnitNumber'])
+            .where({ PackagingMaterialType: ['Z001', 'Z002'] });
 
         if ((req.query.SELECT as any)?.search) {
             const filters = (req.query.SELECT as any).search as IWhereClause[];
-            const searchValues = filters.map(filter => filter.val as string);
+            const firstFilter = filters[0];
+            if (typeof firstFilter === "object" && firstFilter.val) {
+                const searchValue = String(firstFilter.val);
 
-            uniqueHUs = uniqueHUs.filter((hu: { HUNumber: string }) =>
-                searchValues.some(searchValue => hu.HUNumber.includes(searchValue))
-            );
+                allHUsQuery = allHUsQuery.and(
+                    `(startswith(HandlingUnitNumber, '${searchValue}') or endswith(HandlingUnitNumber, '${searchValue}'))`
+                );
+            }
         }
 
-        const finalUniqueHUs = Array.from(new Set(uniqueHUs.map(hu => hu.HUNumber)))
-            .map(hu => ({ HUNumber: hu }));
+        const allHUs = await handlingCDS.run(allHUsQuery) as { HandlingUnitNumber: string }[];
 
-        return finalUniqueHUs;
+        const uniqueHUs = Array.from(
+            new Set(allHUs.map((item) =>
+                item.HandlingUnitNumber.replace(/^0+/, '')
+            ))
+        ).map(hu => ({ HandlingUnitNumber: hu }));
+
+        return uniqueHUs;
 
     } catch (error) {
         console.error("Error in getHandlingUnitNumbers: ", error);
@@ -170,28 +359,31 @@ const getHandlingUnitNumbers: OnEventHandler = async function (req: TypedRequest
 const getProducts: OnEventHandler = async function (req: TypedRequest<{ Product: string }[]>): Promise<{ Product: string }[]> {
     try {
         const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-        const allProduct = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('Product'));
-        let uniqueProduct: { Product: string }[] = [];
 
-        allProduct.forEach((item: { Product: string }) => {
-            if (item.Product !== '' && !uniqueProduct.some(product => product.Product === item.Product)) {
-                uniqueProduct.push({ Product: item.Product });
-            }
-        });
+        let productQuery = SELECT.from('YY1_HUInfoPalletbox_ewm')
+            .columns(['Product'])
+            .where("Product != ''");
 
         if ((req.query.SELECT as any)?.search) {
             const filters = (req.query.SELECT as any).search as IWhereClause[];
-            const searchValues = filters.map(filter => filter.val as string);
+            const firstFilter = filters[0];
 
-            uniqueProduct = uniqueProduct.filter((product: { Product: string }) =>
-                searchValues.some(searchValue => product.Product.includes(searchValue))
-            );
+            if (typeof firstFilter === "object" && firstFilter.val) {
+                const searchValue = String(firstFilter.val);
+
+                productQuery = productQuery.and(
+                    `(startswith(Product, '${searchValue}') or endswith(Product, '${searchValue}') or contains(Product, '${searchValue}'))`
+                );
+            }
         }
 
-        const finalUniqueProducts = Array.from(new Set(uniqueProduct.map(product => product.Product)))
-            .map(product => ({ Product: product }));
+        const allProducts = await handlingCDS.run(productQuery) as { Product: string }[];
 
-        return finalUniqueProducts;
+        const uniqueProducts = Array.from(
+            new Set(allProducts.map(item => item.Product))
+        ).map(product => ({ Product: product }));
+
+        return uniqueProducts;
 
     } catch (error) {
         console.error("Error in getProducts: ", error);
@@ -199,32 +391,34 @@ const getProducts: OnEventHandler = async function (req: TypedRequest<{ Product:
     }
 };
 
-
 const getVHStorageBins: OnEventHandler = async function (req: TypedRequest<{ EWMStorageBin_1: string }[]>): Promise<{ EWMStorageBin: string }[]> {
     try {
         const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-        const allStorageBins = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('EWMStorageBin_1'));
-        let uniqueStorageBins: { EWMStorageBin: string }[] = [];
 
-        allStorageBins.forEach((item: { EWMStorageBin_1: string }) => {
-            if (item.EWMStorageBin_1 !== '' && !uniqueStorageBins.some(bin => bin.EWMStorageBin === item.EWMStorageBin_1)) {
-                uniqueStorageBins.push({ EWMStorageBin: item.EWMStorageBin_1 });
-            }
-        });
+        let storageBinQuery = SELECT.from('YY1_HUInfoPalletbox_ewm')
+            .columns(['EWMStorageBin_1'])
+            .where("EWMStorageBin_1 != ''");
 
         if ((req.query.SELECT as any)?.search) {
             const filters = (req.query.SELECT as any).search as IWhereClause[];
-            const searchValues = filters.map(filter => filter.val as string);
+            const firstFilter = filters[0];
 
-            uniqueStorageBins = uniqueStorageBins.filter((bin: { EWMStorageBin: string }) =>
-                searchValues.some(searchValue => bin.EWMStorageBin.includes(searchValue))
-            );
+            if (typeof firstFilter === "object" && firstFilter.val) {
+                const searchValue = String(firstFilter.val);
+
+                storageBinQuery = storageBinQuery.and(
+                    `(startswith(EWMStorageBin_1, '${searchValue}') or endswith(EWMStorageBin_1, '${searchValue}') or contains(EWMStorageBin_1, '${searchValue}'))`
+                );
+            }
         }
 
-        const finalUniqueStorageBins = Array.from(new Set(uniqueStorageBins.map(bin => bin.EWMStorageBin)))
-            .map(bin => ({ EWMStorageBin: bin }));
+        const allStorageBins = await handlingCDS.run(storageBinQuery) as { EWMStorageBin_1: string }[];
 
-        return finalUniqueStorageBins;
+        const uniqueStorageBins = Array.from(
+            new Set(allStorageBins.map(item => item.EWMStorageBin_1))
+        ).map(bin => ({ EWMStorageBin: bin }));
+
+        return uniqueStorageBins;
 
     } catch (error) {
         console.error("Error in getVHStorageBins: ", error);
@@ -235,30 +429,31 @@ const getVHStorageBins: OnEventHandler = async function (req: TypedRequest<{ EWM
 const getStorageTypes: OnEventHandler = async function (req: TypedRequest<{ EWMStorageType_1: string }[]>): Promise<{ EWMStorageType: string }[]> {
     try {
         const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-        const allStorageTypes = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('EWMStorageType_1').where({
-            PackagingMaterialType: ['Z001', 'Z002']
-        }));
-        let uniqueStorageTypes: { EWMStorageType: string }[] = [];
 
-        allStorageTypes.forEach((item: { EWMStorageType_1: string }) => {
-            if (item.EWMStorageType_1 !== '' && !uniqueStorageTypes.some(type => type.EWMStorageType === item.EWMStorageType_1)) {
-                uniqueStorageTypes.push({ EWMStorageType: item.EWMStorageType_1 });
-            }
-        });
+        let storageTypeQuery = SELECT.from('YY1_HUInfoPalletbox_ewm')
+            .columns(['EWMStorageType_1'])
+            .where("EWMStorageType_1 != '' and PackagingMaterialType in ('Z001', 'Z002')");
 
         if ((req.query.SELECT as any)?.search) {
             const filters = (req.query.SELECT as any).search as IWhereClause[];
-            const searchValues = filters.map(filter => filter.val as string);
+            const firstFilter = filters[0];
 
-            uniqueStorageTypes = uniqueStorageTypes.filter((type: { EWMStorageType: string }) =>
-                searchValues.some(searchValue => type.EWMStorageType.includes(searchValue))
-            );
+            if (typeof firstFilter === "object" && firstFilter.val) {
+                const searchValue = String(firstFilter.val);
+
+                storageTypeQuery = storageTypeQuery.and(
+                    `(startswith(EWMStorageType_1, '${searchValue}') or endswith(EWMStorageType_1, '${searchValue}') or contains(EWMStorageType_1, '${searchValue}'))`
+                );
+            }
         }
 
-        const finalUniqueStorageTypes = Array.from(new Set(uniqueStorageTypes.map(type => type.EWMStorageType)))
-            .map(type => ({ EWMStorageType: type }));
+        const allStorageTypes = await handlingCDS.run(storageTypeQuery) as { EWMStorageType_1: string }[];
 
-        return finalUniqueStorageTypes;
+        const uniqueStorageTypes = Array.from(
+            new Set(allStorageTypes.map(item => item.EWMStorageType_1))
+        ).map(type => ({ EWMStorageType: type }));
+
+        return uniqueStorageTypes;
 
     } catch (error) {
         console.error("Error in getStorageTypes: ", error);
@@ -266,32 +461,34 @@ const getStorageTypes: OnEventHandler = async function (req: TypedRequest<{ EWMS
     }
 };
 
-
 const getProductionOrders: OnEventHandler = async function (req: TypedRequest<{ ProductionOrder: string }[]>): Promise<{ ProductionOrder: string }[]> {
     try {
         const handlingCDS = await connect.to("YY1_HUINFOPALLETBOX");
-        const allOrders = await handlingCDS.run(SELECT.from('YY1_HUInfoPalletbox_ewm').columns('ProductionOrder'));
-        let uniqueOrders: { ProductionOrder: string }[] = [];
 
-        allOrders.forEach((item: { ProductionOrder: string }) => {
-            if (item.ProductionOrder !== '' && !uniqueOrders.some(order => order.ProductionOrder === item.ProductionOrder)) {
-                uniqueOrders.push({ ProductionOrder: item.ProductionOrder });
-            }
-        });
+        let productionOrderQuery = SELECT.from('YY1_HUInfoPalletbox_ewm')
+            .columns(['ProductionOrder'])
+            .where("ProductionOrder != ''");
 
         if ((req.query.SELECT as any)?.search) {
             const filters = (req.query.SELECT as any).search as IWhereClause[];
-            const searchValues = filters.map(filter => filter.val as string);
+            const firstFilter = filters[0];
 
-            uniqueOrders = uniqueOrders.filter((order: { ProductionOrder: string }) =>
-                searchValues.some(searchValue => order.ProductionOrder.includes(searchValue))
-            );
+            if (typeof firstFilter === "object" && firstFilter.val) {
+                const searchValue = String(firstFilter.val);
+
+                productionOrderQuery = productionOrderQuery.and(
+                    `(startswith(ProductionOrder, '${searchValue}') or endswith(ProductionOrder, '${searchValue}') or contains(ProductionOrder, '${searchValue}'))`
+                );
+            }
         }
 
-        const finalUniqueOrders = Array.from(new Set(uniqueOrders.map(order => order.ProductionOrder)))
-            .map(order => ({ ProductionOrder: order }));
+        const allOrders = await handlingCDS.run(productionOrderQuery) as { ProductionOrder: string }[];
 
-        return finalUniqueOrders;
+        const uniqueOrders = Array.from(
+            new Set(allOrders.map(item => item.ProductionOrder))
+        ).map(order => ({ ProductionOrder: order }));
+
+        return uniqueOrders;
 
     } catch (error) {
         console.error("Error in getProductionOrders: ", error);
@@ -299,23 +496,30 @@ const getProductionOrders: OnEventHandler = async function (req: TypedRequest<{ 
     }
 };
 
+
 const getEWMWarehouseBins: OnEventHandler = async function (req: TypedRequest<{ EWMWarehouse: string }>): Promise<IStorageBins[]> {
     try {
         const EWMWarehouse = req.data.EWMWarehouse;
+
         const storageService = await connect.to("WAREHOUSESTORAGEBIN");
         const { WarehouseStorageBin } = storageService.entities;
-        let storageBins: IStorageBins[];
 
-        storageBins = await storageService.run(SELECT.from(WarehouseStorageBin).where({ EWMWarehouse: EWMWarehouse }));
+        let storageBinQuery = SELECT.from(WarehouseStorageBin).where({ EWMWarehouse });
 
         if ((req.query.SELECT as any)?.search) {
             const filters = (req.query.SELECT as any).search as IWhereClause[];
-            const searchValues = filters.map(filter => filter.val as string);
+            const firstFilter = filters[0];
 
-            storageBins = storageBins.filter(bin =>
-                searchValues.some(searchValue => bin.EWMStorageBin.includes(searchValue))
-            );
+            if (typeof firstFilter === "object" && firstFilter.val) {
+                const searchValue = String(firstFilter.val);
+
+                storageBinQuery = storageBinQuery.and(
+                    `(startswith(EWMStorageBin, '${searchValue}') or endswith(EWMStorageBin, '${searchValue}') or contains(EWMStorageBin, '${searchValue}'))`
+                );
+            }
         }
+
+        const storageBins = await storageService.run(storageBinQuery) as IStorageBins[];
 
         return storageBins;
 
@@ -329,22 +533,27 @@ const getStorageBins: OnEventHandler = async function (req: TypedRequest<IStorag
     try {
         const storageService = await connect.to("WAREHOUSESTORAGEBIN");
         const { WarehouseStorageBin } = storageService.entities;
-        let storageBins: IStorageBins[];
+
+        let storageBinQuery = SELECT.from(WarehouseStorageBin);
 
         if (req.query.SELECT?.where) {
-            storageBins = await storageService.run(SELECT.from(WarehouseStorageBin).where(req.query.SELECT.where));
-        } else {
-            storageBins = await storageService.run(SELECT.from(WarehouseStorageBin));
+            storageBinQuery = storageBinQuery.where(req.query.SELECT.where);
         }
 
         if ((req.query.SELECT as any)?.search) {
             const filters = (req.query.SELECT as any).search as IWhereClause[];
-            const searchValues = filters.map(filter => filter.val as string);
+            const firstFilter = filters[0];
 
-            storageBins = storageBins.filter(bin =>
-                searchValues.some(searchValue => bin.EWMStorageBin.includes(searchValue))
-            );
+            if (typeof firstFilter === "object" && firstFilter.val) {
+                const searchValue = String(firstFilter.val);
+
+                storageBinQuery = storageBinQuery.and(
+                    `(startswith(EWMStorageBin, '${searchValue}') or endswith(EWMStorageBin, '${searchValue}') or contains(EWMStorageBin, '${searchValue}'))`
+                );
+            }
         }
+
+        const storageBins = await storageService.run(storageBinQuery) as IStorageBins[];
 
         return storageBins;
 
@@ -353,6 +562,7 @@ const getStorageBins: OnEventHandler = async function (req: TypedRequest<IStorag
         throw new Error("Failed to fetch storage bins");
     }
 };
+
 
 export {
     getHandlingUnits,

@@ -1,4 +1,4 @@
-import { OnEventHandler, TypedRequest, connect, operator } from "@sap/cds";
+import { OnEventHandler, TypedRequest, connect } from "@sap/cds";
 import { IHandlingUnits, IHandlingUnitItems, IHandlingUnitsArray, IWhereClause, IStorageBins, IOrderByClause, IMoveHUBody } from "../../types/homepage.types";
 import FilterOperations from "../util/FilterOperations";
 import DataOperations from "../util/DataOperations";
@@ -11,166 +11,12 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
     const { YY1_HUInfoPalletbox_ewm } = handlingCDS.entities;
     const whereClause = req.query.SELECT?.where as any[];
 
-    const cleanedWhereClause = whereClause ? filterOperations.removeFilters(whereClause, ["HierarchyLevel", "ParentNodeID"]) : null;
+    const cleanedWhereClause = whereClause ? filterOperations.removeFilters(whereClause, ["HierarchyLevel", "ParentNodeID"]) : [];
 
     const parentNodeID = FilterOperations.getGlobalParentNodeID();
     const hierarchyLevel = parentNodeID ? 1 : 0;
 
-    const extendedWhereClause = cleanedWhereClause?.reduce<(string | IWhereClause)[]>((acc, item, index, array) => {
-        if (typeof item === "object" && item.xpr) {
-            let skipXprIndexes = 0;
-
-            const modifiedXpr = item.xpr.reduce<(string | IWhereClause)[]>((xprAcc, xprItem, xprIndex, xprArray) => {
-                if (skipXprIndexes > 0) {
-                    skipXprIndexes--;
-                    return xprAcc;
-                }
-
-                if (typeof xprItem === "object" && xprItem.ref?.[0] === "HandlingUnitNumber") {
-                    const nextXprItem = xprArray[xprIndex + 2];
-                    if (typeof nextXprItem === "object" && nextXprItem.val) {
-                        const handlingUnitValue = String(nextXprItem.val).padStart(20, "0");
-
-                        xprAcc.push({
-                            xpr: [
-                                { ref: ["HandlingUnitNumber"] }, "=", { val: handlingUnitValue },
-                                "or",
-                                { ref: ["HandlingUnitNumber_1"] }, "=", { val: handlingUnitValue }
-                            ]
-                        } as IWhereClause);
-
-                        skipXprIndexes = 2;
-                        return xprAcc;
-                    }
-                }
-
-                if (typeof xprItem === "object" && xprItem.ref?.[0] === "HandlingUnitStatus") {
-                    const nextXprItem = xprArray[xprIndex + 2];
-                    if (typeof nextXprItem === "object" && nextXprItem.val) {
-                        if (nextXprItem.val === "Received") {
-                            xprAcc.push({
-                                xpr: [
-                                    { ref: ["AvailableEWMStockQty"] },
-                                    ">",
-                                    { val: 0 }
-                                ]
-                            } as IWhereClause);
-                        } else if (nextXprItem.val === "Planned") {
-                            xprAcc.push({
-                                xpr: [
-                                    { ref: ["AvailableEWMStockQty"] },
-                                    "=",
-                                    { val: null }
-                                ]
-                            } as IWhereClause);
-                            acc.push({
-                                xpr: [
-                                    { ref: ["AvailableEWMStockQty"] },
-                                    "=",
-                                    { val: null }
-                                ]
-                            } as IWhereClause);
-
-                            acc.push("and");
-
-                            acc.push({
-                                xpr: [
-                                    { ref: ["HandlingUnitNumber_1"] },
-                                    "!=",
-                                    { val: "" }
-                                ]
-                            } as IWhereClause);
-                        }
-
-                        skipXprIndexes = 2;
-                        return xprAcc;
-                    }
-                }
-
-                xprAcc.push(xprItem);
-                return xprAcc;
-            }, []);
-
-            acc.push({ ...item, xpr: modifiedXpr });
-            return acc;
-        }
-
-        if (typeof item === "object" && item.ref?.[0] === "HandlingUnitNumber") {
-            const nextItem = array[index + 2];
-            if (typeof nextItem === "object" && nextItem.val) {
-                const handlingUnitValue = String(nextItem.val).padStart(20, "0");
-
-                acc.push({
-                    xpr: [
-                        { ref: ["HandlingUnitNumber"] }, "=", { val: handlingUnitValue },
-                        "or",
-                        { ref: ["HandlingUnitNumber_1"] }, "=", { val: handlingUnitValue }
-                    ]
-                } as IWhereClause);
-
-                return acc;
-            }
-        }
-
-        if (typeof item === "object" && item.ref?.[0] === "HandlingUnitStatus") {
-            const nextItem = array[index + 2];
-            if (typeof nextItem === "object" && nextItem.val) {
-                if (nextItem.val === "Received") {
-                    acc.push({
-                        xpr: [
-                            { ref: ["AvailableEWMStockQty"] },
-                            ">",
-                            { val: 0 }
-                        ]
-                    } as IWhereClause);
-                } else if (nextItem.val === "Planned") {
-                    acc.push({
-                        xpr: [
-                            { ref: ["AvailableEWMStockQty"] },
-                            "=",
-                            { val: null }
-                        ]
-                    } as IWhereClause);
-
-                    acc.push("and");
-
-                    acc.push({
-                        xpr: [
-                            { ref: ["HandlingUnitNumber_1"] },
-                            "!=",
-                            { val: "" }
-                        ]
-                    } as IWhereClause);
-                }
-
-                index += 2;
-                if (array[index + 1] === "and" || array[index + 1] === "or") {
-                    index += 1;
-                }
-                return acc;
-            }
-        }
-
-        const previousItem = array[index - 1];
-        const twoItemsBefore = array[index - 2];
-
-        if (
-            (typeof previousItem === "object" && previousItem.ref?.[0] === "HandlingUnitNumber") ||
-            (typeof twoItemsBefore === "object" && twoItemsBefore.ref?.[0] === "HandlingUnitNumber")
-        ) {
-            return acc;
-        }
-
-        if (
-            (typeof previousItem === "object" && previousItem.ref?.[0] === "HandlingUnitStatus") ||
-            (typeof twoItemsBefore === "object" && twoItemsBefore.ref?.[0] === "HandlingUnitStatus")
-        ) {
-            return acc;
-        }
-
-        acc.push(item);
-        return acc;
-    }, []);
+    const extendedWhereClause = filterOperations.buildExtendedWhereClause(cleanedWhereClause);
 
     const additionalFilter = [
         { ref: ["HandlingUnitIndicator"] },
@@ -178,7 +24,7 @@ const getHandlingUnits: OnEventHandler = async function (req: TypedRequest<IHand
         { val: "A" }
     ];
 
-    let finalWhereClause: any[] = extendedWhereClause
+    let finalWhereClause = extendedWhereClause
         ? [...extendedWhereClause, "and", ...additionalFilter]
         : additionalFilter;
 

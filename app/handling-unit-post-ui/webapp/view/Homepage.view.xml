@@ -55,7 +55,7 @@
                     header="{i18n>handlingUnit}"
                     showRowCount="true"
                     enableCopy="false"
-                    enableExport="true"
+                    enableExport="false"
                     beforeExport=".onBeforeExport"
                     enableAutoBinding="false"
                     editTogglable="false"
@@ -67,6 +67,16 @@
                         <OverflowToolbar design="Transparent">
                             <ToolbarSpacer />
                             <Button
+                                type="Transparent"
+                                icon="sap-icon://collapse-all"
+                                press="onCollapseAll"
+                            />
+                            <Button
+                                type="Transparent"
+                                icon="sap-icon://expand-all"
+                                press="onExpandAll"
+                            />
+                            <Button
                                 text="{i18n>clearAll}"
                                 type="Transparent"
                                 icon="sap-icon://clear-all"
@@ -77,6 +87,11 @@
                                 type="Emphasized"
                                 icon="sap-icon://journey-depart"
                                 press="onMoveHandlingUnit"
+                            />
+                            <Button
+                                type="Transparent"
+                                icon="sap-icon://download"
+                                press="onExportHandlingUnits"
                             />
                         </OverflowToolbar>
                     </smartTable:customToolbar>

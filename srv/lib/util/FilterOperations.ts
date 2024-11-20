@@ -10,6 +10,7 @@ export default class FilterOperations {
     public static getGlobalParentNodeID(): string | null {
         return this.globalParentNodeID;
     }
+
     public removeFilters(whereArray: (string | IWhereClause)[], keysToRemove: string[]): (string | IWhereClause)[] {
         const cleanedWhere: (string | IWhereClause)[] = []; 
     
@@ -130,6 +131,23 @@ export default class FilterOperations {
     
                 acc.push({ ...item, xpr: modifiedXpr });
                 return acc;
+            }
+
+            if (typeof item === "object" && item.ref?.[0] === "HandlingUnitNumber") {
+                const nextItem = array[index + 2];
+                if (nextItem && typeof nextItem === "object" && nextItem.val) {
+                    const handlingUnitValue = String(nextItem.val).padStart(20, "0");
+    
+                    acc.push({
+                        xpr: [
+                            { ref: ["HandlingUnitNumber"] }, "=", { val: handlingUnitValue },
+                            "or",
+                            { ref: ["HandlingUnitNumber_1"] }, "=", { val: handlingUnitValue }
+                        ]
+                    } as IWhereClause);
+    
+                    return acc;
+                }
             }
     
             if (typeof item === "object" && item.ref?.[0] === "HandlingUnitStatus") {

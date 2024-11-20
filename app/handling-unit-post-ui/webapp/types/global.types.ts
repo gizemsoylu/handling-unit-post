@@ -48,3 +48,17 @@ export interface IMoveHUtoBin {
 export interface IMoveHUBody {
     moveHUs: IMoveHUtoBin[];
 }
+
+export interface IHandlingUnits {
+    HierarchyLevel: number;
+    Product?: string;    
+    HandlingUnitNumber: string;
+    HandlingUnitStatus: string;
+    PackagingMaterial?: string;
+    ProductionOrder?: string;
+    QuantityPerHU: number;
+    EWMStorageBin: string;
+    EWMStorageType: string;
+    EWMWarehouse?: string;
+    CreationDate?: Date | null;
+}

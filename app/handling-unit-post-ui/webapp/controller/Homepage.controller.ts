@@ -5,7 +5,7 @@ import { Button$ClickEvent } from "sap/ui/webc/main/Button";
 import BusyIndicator from "sap/ui/core/BusyIndicator";
 import EntryCreateCL from "ui5/antares/entry/v2/EntryCreateCL";
 import MessageBox from "sap/m/MessageBox";
-import { IStorageBins, IMoveHUtoBin, Routes, IMoveHUBody } from "../types/global.types";
+import { IStorageBins, IMoveHUtoBin, Routes, IMoveHUBody, IHandlingUnits } from "../types/global.types";
 import ResponseCL from "ui5/antares/entry/v2/ResponseCL";
 import { ISubmitResponse } from "ui5/antares/types/entry/submit";
 import { FormTypes } from "ui5/antares/types/entry/enums";
@@ -30,7 +30,8 @@ import SmartTable from "sap/ui/comp/smarttable/SmartTable";
 import ODataListBinding from "sap/ui/model/odata/v2/ODataListBinding";
 import Dialog from "sap/m/Dialog";
 import Control from "sap/ui/core/Control";
-import { ExportBase$BeforeExportEvent } from "sap/ui/export/ExportBase";
+import Spreadsheet from "sap/ui/export/Spreadsheet";
+import ODataTreeBinding from "sap/ui/model/odata/v2/ODataTreeBinding";
 
 /**
  * @namespace com.ndbs.handlingunitpostui.controller
@@ -136,24 +137,78 @@ export default class Homepage extends BaseController {
         table.removeSelectionInterval(selectedIndices[0], lastIndex);
     }
 
-    public onBeforeExport(event: ExportBase$BeforeExportEvent): void {
-        const exportSettings = event.getParameter("exportSettings") as {
-            dataSource: {
-                count: number;
-                downloadLimit: number;
-            };
-        };
+    // public onBeforeExport(event: ExportBase$BeforeExportEvent): void {
+    //     const exportSettings = event.getParameter("exportSettings") as {
+    //         dataSource: {
+    //             count: number;
+    //             downloadLimit: number;
+    //             sizeLimit: number;
+    //         };
+    //     };
 
-        if (exportSettings && exportSettings.dataSource) {
-            const table = this.byId("uiTreeHandlingUnit") as TreeTable;
-            const rowBinding = table.getBinding("rows") as ODataListBinding;
-            const length = rowBinding.getLength();
+    //     if (exportSettings && exportSettings.dataSource) {
+    //         const table = this.byId("uiTreeHandlingUnit") as TreeTable;
+    //         const rowBinding = table.getBinding("rows") as ODataListBinding;
+    //         const length = rowBinding.getLength();
 
-            exportSettings.dataSource.count = length;
-            exportSettings.dataSource.downloadLimit = length;
-        }
+    //         exportSettings.dataSource.count = length;
+    //         exportSettings.dataSource.downloadLimit = length;
+    //         exportSettings.dataSource.sizeLimit = length;
+    //     }
+    // }
+
+    public onCollapseAll(): void {
+        const table = this.byId("uiTreeHandlingUnit") as TreeTable;
+        table.collapseAll();
     }
 
+    public onExpandAll(): void {
+        const table = this.byId("uiTreeHandlingUnit") as TreeTable;
+        table.expandToLevel(1);
+    }
+ 
+    public async onExportHandlingUnits(): Promise<void> {
+        const table = this.byId("uiTreeHandlingUnit") as TreeTable;
+        const rowBinding = table.getBinding("rows") as ODataTreeBinding;
+    
+        if (!rowBinding) {
+            return;
+        }
+    
+        table.setBusy(true);
+    
+        try {
+            const parentIndexes = this.getParentIndexes(rowBinding);
+    
+            const expandPromises = parentIndexes.map(async (index) => {
+                if (table.isExpanded(index)) {
+                    return Promise.resolve();
+                }
+    
+                table.setFirstVisibleRow(index);
+                await this.expandNode(table, index); 
+      
+            });
+    
+            await Promise.allSettled(expandPromises);
+
+            const flatData = this.getAllNodes(table);
+            
+            this.exportToSpreadsheet(flatData); 
+            
+        } catch (error) {
+            Messaging.addMessages(
+                new Message({
+                    message: this.getResourceBundleText("operationError", [error]),
+                    type: MessageType.Error,
+                })
+            );
+        } finally {
+            this.onCollapseAll();
+            table.setBusy(false);
+        }
+    }
+    
     /* ======================================================================================================================= */
     /* Internal Handlers                                                                                                       */
     /* ======================================================================================================================= */
@@ -258,4 +313,103 @@ export default class Homepage extends BaseController {
         const storageBins = await odata.read();
         return storageBins[0].EWMStorageType
     }
+
+    private getAllNodes(oTreeTable: TreeTable): any[] {
+        const binding = oTreeTable.getBinding("rows") as ODataTreeBinding;
+        const allData: any[] = [];
+
+        const loadAllNodes = (parent: Context | null): void => {
+            let contexts: Context[];
+
+            if (parent === null) {
+                contexts = binding.getRootContexts(0, binding.getLength());
+            } else {
+                contexts = binding.getNodeContexts(parent, 0, binding.getChildCount(parent));
+            }
+
+            contexts.forEach((context: Context) => {
+                const data = context.getObject();
+                allData.push(data);
+
+                if (binding.hasChildren && binding.hasChildren(context)) {
+                    loadAllNodes(context);
+                }
+            });
+        };
+
+        loadAllNodes(null);
+        return allData;
+    }
+
+    private exportToSpreadsheet(data: IHandlingUnits[]): void {
+        const settings = {
+            workbook: {
+                columns: [
+                    { label: "Hierarchy Level", property: "HierarchyLevel" },
+                    { label: "HandlingUnitNumber", property: "HandlingUnitNumber" },
+                    { label: "Status", property: "HandlingUnitStatus" },
+                    { label: "Carrier", property: "PackagingMaterial" },
+                    { label: "Product", property: "Product" },
+                    { label: "Quantity Per", property: "QuantityPerHU" },
+                    { label: "Storage Bin", property: "EWMStorageBin" },
+                    { label: "Storage Type", property: "EWMStorageType" },
+                    { label: "Creation Date", property: "CreationDate" },
+                    { label: "Production Order", property: "ProductionOrder" },
+                    { label: "Warehouse", property: "EWMWarehouse" },
+                ]
+            },
+            dataSource: data,
+            fileName: "HandlingUnits.xlsx"
+        };
+
+        const spreadsheet = new Spreadsheet(settings);
+        spreadsheet.build()
+            .then(() => { })
+            .catch((error) => { });
+    }
+
+    private async expandNode(table: TreeTable, index: number): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            const rowBinding = table.getBinding("rows") as ODataTreeBinding;
+    
+            if (!rowBinding) {
+                console.log("Row binding not found.");
+                return;
+            }
+    
+            const dataReceivedHandler = (): void => {
+                rowBinding.detachDataReceived(dataReceivedHandler);
+                resolve();
+            };
+    
+            const timeout = setTimeout(() => {
+                rowBinding.detachDataReceived(dataReceivedHandler);
+                console.log("Expand operation timed out.");
+            }, 5000);
+    
+            rowBinding.attachDataReceived(dataReceivedHandler);
+    
+            try {
+                table.expand(index); 
+            } catch (error) {
+                clearTimeout(timeout);
+                rowBinding.detachDataReceived(dataReceivedHandler);
+                console.log(`Error during expand operation: ${error}`);
+            }
+        });
+    }
+    
+    private getParentIndexes(rowBinding: ODataTreeBinding): number[] {
+        const totalRows = rowBinding.getLength();
+        const parentIndexes: number[] = [];
+    
+        for (let i = 0; i < totalRows; i++) {
+            const context = rowBinding.getContexts(i, 1)[0];
+            if (context && rowBinding.hasChildren(context)) {
+                parentIndexes.push(i);
+            }
+        }
+    
+        return parentIndexes;
+    }    
 }
